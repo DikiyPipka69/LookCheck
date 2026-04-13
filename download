@@ -1,0 +1,17 @@
+# VS Code
+.vscode/
+*.code-workspace
+.history/
+*.log
+
+# PyCharm
+.idea/
+*.iml
+*.iws
+.ipr
+.idea_modules/
+*.pyc
+__pycache__/
+
+
+
