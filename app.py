@@ -20,13 +20,13 @@ def detect(image_path):                # Основная функция код�
                              # Дизайн сайта
 css = """
 .gradio-container {
-    background-color: #b0dfe5 !important;
-    max-width: 700px !important;                              
+    background-color: #0d0d0d !important;
+    max-width: 700px !important;
     margin: auto !important;
 }
 #title {
     text-align: center;
-    color: #0016ec;
+    color: #a855f7;
     font-size: 2.5em;
     font-weight: bold;
     margin: 20px 0 5px 0;
@@ -38,9 +38,9 @@ css = """
     margin-bottom: 30px;
 }
 #upload {
-    border: 2px dashed #bb9bfe !important;
+    border: 2px dashed #7c3aed !important;
     border-radius: 16px !important;
-    background: #e3a9fe !important;
+    background: #1a1a2e !important;
 }
 #result {
     background: #1a1a2e !important;
