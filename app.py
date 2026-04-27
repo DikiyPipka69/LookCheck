@@ -1,7 +1,7 @@
 import gradio as gr
 from ultralytics import YOLO
 
-model = YOLO("runs/detect/train13/weights/best.pt")
+model = YOLO("runs/detect/train16/weights/best.pt")
 
 def detect(image_path):
     if image_path is None:
@@ -88,37 +88,6 @@ with gr.Blocks(css=css, theme=gr.themes.Base()) as demo:
 
 if __name__ == "__main__":
     demo.launch()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
