@@ -42,6 +42,17 @@ css = """
     border-radius: 16px !important;
     background: #1a1a2e !important;
 }
+#upload {
+    border: 2px dashed #7c3aed !important;
+    border-radius: 16px !important;
+    background: rgba(26, 26, 46, 0.7) !important; /* полупрозрачный */
+    backdrop-filter: blur(4px) !important; /* опционально: размытие подложки */
+    transition: all 0.3s ease !important;
+}
+#upload:hover {
+    background: rgba(106, 90, 205, 0.5) !important; /* светлый полупрозрачный слой */
+    border-color: #a855f7 !important; /* опционально: подсветка границы */
+}
 #result {
     background: #1a1a2e !important;
     border: 1px solid #7c3aed !important;
