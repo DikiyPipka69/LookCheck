@@ -3,27 +3,30 @@ from ultralytics import YOLO
 
 model = YOLO("runs/detect/train13/weights/best.pt")
 
-def detect(image_path):
-    if image_path is None:
+def detect(image_path):                # Основная функция кода непосредственно для распознавания
+    if image_path is None:                # Проверка на наличие фото
         return "❌ Загрузите фото"
-    results = model(image_path)
+    results = model(image_path)            # Распознование
     output = ""
-    for r in results:
+    for r in results:                       # Обработка результатов
         for box in r.boxes:
-            class_name = model.names[int(box.cls[0])]
-            confidence = float(box.conf[0])
-            output += f"👗 {class_name}: {confidence:.0%}\n"
+            class_name = model.names[int(box.cls[0])]        # Определение названия предмета
+            confidence = float(box.conf[0])                     # Расчитывание уверенности
+            output += f"👗 {class_name}: {confidence:.0%}\n"       # Перевод уверенности в проценты
     return output if output else "❌ Ничего не найдено"
 
+
+
+                             # Дизайн сайта
 css = """
 .gradio-container {
-    background-color: #0d0d0d !important;
-    max-width: 700px !important;
+    background-color: #b0dfe5 !important;
+    max-width: 700px !important;                              
     margin: auto !important;
 }
 #title {
     text-align: center;
-    color: #a855f7;
+    color: #0016ec;
     font-size: 2.5em;
     font-weight: bold;
     margin: 20px 0 5px 0;
@@ -35,9 +38,9 @@ css = """
     margin-bottom: 30px;
 }
 #upload {
-    border: 2px dashed #7c3aed !important;
+    border: 2px dashed #bb9bfe !important;
     border-radius: 16px !important;
-    background: #1a1a2e !important;
+    background: #e3a9fe !important;
 }
 #result {
     background: #1a1a2e !important;
@@ -60,23 +63,23 @@ css = """
 }
 """
 
-with gr.Blocks(css=css, theme=gr.themes.Base()) as demo:
-    gr.HTML("<div id='title'>👕 LookChecker</div>")
+with gr.Blocks(css=css, theme=gr.themes.Base()) as demo:                    # Применение css
+    gr.HTML("<div id='title'>👕 LookCheck</div>")                                           # Заголовки
     gr.HTML("<div id='subtitle'>Загрузите фото одежды — модель определит тип</div>")
 
-    with gr.Row():
+    with gr.Row():                         # Поле для загрузки фото
         image_input = gr.Image(
             type="filepath",
             label="",
             elem_id="upload",
-            sources=["upload"],  # только загрузка, без камеры и буфера
+            sources=["upload"],  # Только загрузка, без камеры и буфера
             show_label=False
         )
 
-    with gr.Row():
+    with gr.Row():                                                 # Кнопка
         btn = gr.Button("🔍 Определить", elem_id="btn")
 
-    with gr.Row():
+    with gr.Row():                    # Поле вывода
         result_output = gr.Text(
             label="",
             elem_id="result",
@@ -84,9 +87,9 @@ with gr.Blocks(css=css, theme=gr.themes.Base()) as demo:
             placeholder="Результат появится здесь..."
         )
 
-    btn.click(fn=detect, inputs=image_input, outputs=result_output)
+    btn.click(fn=detect, inputs=image_input, outputs=result_output)        # Связывание кнопки с функцией
 
-if __name__ == "__main__":
+if __name__ == "__main__":             # Стартуем
     demo.launch()
 
 
