@@ -47,6 +47,7 @@ function handleFile(file) {
         uploadContent.classList.add('hidden');
         analyzeBtn.classList.remove('hidden');
         results.classList.add('hidden');
+        resultsList.innerHTML = '';
     };
     reader.readAsDataURL(file);
 }
@@ -85,14 +86,27 @@ function showResults(detections) {
     if (detections.length === 0) {
         resultsList.innerHTML = '<p style="color: #6b7280">Ничего не найдено</p>';
     } else {
-        detections.forEach(d => {
-            resultsList.innerHTML += `
-                <div class="result-item">
+        detections.forEach((d, i) => {
+            const item = document.createElement('div');
+            item.className = 'result-item';
+            item.style.animationDelay = `${i * 0.1}s`;
+            item.innerHTML = `
+                <div class="result-top">
                     <span class="result-class">👗 ${d.class}</span>
                     <span class="result-confidence">${d.confidence}%</span>
                 </div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" data-width="${d.confidence}"></div>
+                </div>
             `;
+            resultsList.appendChild(item);
         });
+
+        setTimeout(() => {
+            document.querySelectorAll('.progress-bar-fill').forEach(bar => {
+                bar.style.width = bar.dataset.width + '%';
+            });
+        }, 50);
     }
 
     results.classList.remove('hidden');
@@ -122,51 +136,54 @@ function closePanel() {
 }
 
 async function loadHistory() {
-    const response = await fetch('/history');
-    const data = await response.json();
+    try {
+        const response = await fetch('/history');
+        const data = await response.json();
 
-    if (data.history.length === 0) {
-        historyList.innerHTML = '<p class="empty-history">История пуста</p>';
-        return;
+        if (data.history.length === 0) {
+            historyList.innerHTML = '<p class="empty-history">История пуста</p>';
+            return;
+        }
+
+        historyList.innerHTML = data.history.map(item => `
+            <div class="history-item">
+                <div class="history-time">${item.time}</div>
+                <div class="history-file">📎 ${item.filename}</div>
+                ${item.detections.length === 0
+                    ? '<div style="color:#6b7280;font-size:0.9em">Ничего не найдено</div>'
+                    : item.detections.map(d => `
+                        <div class="history-detection">
+                            <span>👗 ${d.class}</span>
+                            <div style="display:flex;align-items:center;gap:8px">
+                                <div style="width:80px;height:5px;background:#2d2d4e;border-radius:10px;overflow:hidden">
+                                    <div style="width:${d.confidence}%;height:100%;background:linear-gradient(90deg,#7c3aed,#a855f7);border-radius:10px"></div>
+                                </div>
+                                <span style="color:#a855f7">${d.confidence}%</span>
+                            </div>
+                        </div>
+                    `).join('')
+                }
+            </div>
+        `).join('');
+    } catch (err) {
+        historyList.innerHTML = '<p class="empty-history">Ошибка загрузки истории</p>';
     }
-
-    historyList.innerHTML = data.history.map(item => `
-        <div class="history-item">
-            <div class="history-time">${item.time}</div>
-            <div class="history-file">📎 ${item.filename}</div>
-            ${item.detections.length === 0
-                ? '<div style="color:#6b7280;font-size:0.9em">Ничего не найдено</div>'
-                : item.detections.map(d => `
-                    <div class="history-detection">
-                        <span>👗 ${d.class}</span>
-                        <span style="color:#a855f7">${d.confidence}%</span>
-                    </div>
-                `).join('')
-            }
-        </div>
-    `).join('');
 }
 
 
+// Тёмная/светлая тема
+const themeBtn = document.getElementById('themeBtn');
+const body = document.body;
 
+// Загрузить сохранённую тему
+if (localStorage.getItem('theme') === 'light') {
+    body.classList.add('light');
+    themeBtn.textContent = '🌙';
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+themeBtn.addEventListener('click', () => {
+    body.classList.toggle('light');
+    const isLight = body.classList.contains('light');
+    themeBtn.textContent = isLight ? '🌙' : '☀️';
+    localStorage.setItem('theme', isLight ? 'light' : 'dark');
+});
