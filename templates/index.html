@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LookChecker</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <a class="logo" href="/">
+            <div class="logo-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"/>
+                    <path d="m21 21-4.35-4.35"/>
+                    <path d="M11 8v6M8 11h6"/>
+                </svg>
+            </div>
+            <span>LookChecker</span>
+        </a>
+        <button class="history-btn">🕐 История</button>
+    </nav>
+
+    <main>
+        <h1>Определение одежды</h1>
+        <p class="subtitle">Загрузите фото — ИИ определит тип и цвет одежды и выделит её на изображении.</p>
+
+        <div class="upload-zone" id="uploadZone">
+            <div class="upload-content" id="uploadContent">
+                <div class="upload-icon">⬆️</div>
+                <p class="upload-title">Перетащите фото сюда</p>
+                <p class="upload-hint">Поддерживаются JPG, PNG, WebP. Чем чётче фото, тем точнее результат.</p>
+                <button class="choose-btn" onclick="document.getElementById('fileInput').click()">
+                    Выбрать файл
+                </button>
+            </div>
+            <img id="previewImage" class="preview-image hidden" alt="preview">
+        </div>
+
+        <input type="file" id="fileInput" accept="image/*" hidden>
+
+        <button class="analyze-btn hidden" id="analyzeBtn">
+            🔍 Определить одежду
+        </button>
+
+        <div class="results hidden" id="results">
+            <h2>Результат анализа</h2>
+            <div id="resultsList"></div>
+        </div>
+
+        <div class="loader hidden" id="loader">
+            <div class="spinner"></div>
+            <p>Анализируем...</p>
+        </div>
+    </main>
+
+    <footer>
+        <p>Умное распознавание одежды с помощью ИИ</p>
+    </footer>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
