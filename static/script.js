@@ -98,7 +98,54 @@ function showResults(detections) {
     results.classList.remove('hidden');
 }
 
+// История
+const historyBtn = document.getElementById('historyBtn');
+const historyPanel = document.getElementById('historyPanel');
+const closeHistory = document.getElementById('closeHistory');
+const overlay = document.getElementById('overlay');
+const historyList = document.getElementById('historyList');
 
+historyBtn.addEventListener('click', async () => {
+    historyPanel.classList.remove('hidden');
+    historyPanel.classList.add('open');
+    overlay.classList.remove('hidden');
+    await loadHistory();
+});
+
+closeHistory.addEventListener('click', closePanel);
+overlay.addEventListener('click', closePanel);
+
+function closePanel() {
+    historyPanel.classList.remove('open');
+    overlay.classList.add('hidden');
+    setTimeout(() => historyPanel.classList.add('hidden'), 400);
+}
+
+async function loadHistory() {
+    const response = await fetch('/history');
+    const data = await response.json();
+
+    if (data.history.length === 0) {
+        historyList.innerHTML = '<p class="empty-history">История пуста</p>';
+        return;
+    }
+
+    historyList.innerHTML = data.history.map(item => `
+        <div class="history-item">
+            <div class="history-time">${item.time}</div>
+            <div class="history-file">📎 ${item.filename}</div>
+            ${item.detections.length === 0
+                ? '<div style="color:#6b7280;font-size:0.9em">Ничего не найдено</div>'
+                : item.detections.map(d => `
+                    <div class="history-detection">
+                        <span>👗 ${d.class}</span>
+                        <span style="color:#a855f7">${d.confidence}%</span>
+                    </div>
+                `).join('')
+            }
+        </div>
+    `).join('');
+}
 
 
 

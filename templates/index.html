@@ -18,7 +18,7 @@
             </div>
             <span>LookChecker</span>
         </a>
-        <button class="history-btn">🕐 История</button>
+        <button class="history-btn" id="historyBtn">🕐 История</button>
     </nav>
 
     <main>
@@ -54,6 +54,18 @@
         </div>
     </main>
 
+    <!-- ПАНЕЛЬ ИСТОРИИ -->
+    <div class="history-panel hidden" id="historyPanel">
+        <div class="history-header">
+            <h2>🕐 История запросов</h2>
+            <button class="close-btn" id="closeHistory">✕</button>
+        </div>
+        <div id="historyList">
+            <p class="empty-history">История пуста</p>
+        </div>
+    </div>
+
+<div class="overlay hidden" id="overlay"></div>
     <footer>
         <p>Умное распознавание одежды с помощью ИИ</p>
     </footer>
