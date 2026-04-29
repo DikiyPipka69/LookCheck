@@ -9,14 +9,16 @@ import uuid
 import os
 from datetime import datetime
 
+# инициализация приложения
 app = FastAPI()
 
+# модель
 model = YOLO("runs/detect/train13/weights/best.pt")
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
-# История запросов
+# история запросов
 history = []
 
 @app.get("/")
@@ -40,7 +42,7 @@ async def detect(file: UploadFile = File(...)):
                 "confidence": round(float(box.conf[0]) * 100, 1)
             })
 
-    # Сохраняем в историю
+    # функция которая сохраняет историю
     history.append({
         "id": uuid.uuid4().hex,
         "time": datetime.now().strftime("%H:%M %d.%m.%Y"),
@@ -50,11 +52,12 @@ async def detect(file: UploadFile = File(...)):
 
     return {"detections": detections}
 
+# ручка для получения истории
 @app.get("/history")
 async def get_history():
     return JSONResponse(content={"history": list(reversed(history))})
 
-
+# конструкция чтобы uvicorn работал пока не выключат
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
