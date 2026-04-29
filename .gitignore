@@ -14,3 +14,19 @@
 __pycache__/
 
 /dataset
+
+runs/detect/train/
+runs/detect/train2/
+runs/detect/train3/
+runs/detect/train4/
+runs/detect/train5/
+runs/detect/train6/
+runs/detect/train7/
+runs/detect/train8/
+runs/detect/train9/
+runs/detect/train10/
+runs/detect/train11/
+runs/detect/train12/
+runs/detect/train13/
+runs/detect/train14/
+runs/detect/train15/
