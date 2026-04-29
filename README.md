@@ -1,31 +1,97 @@
-# LookCheck
+<div align="center">
 
-### Автоматическая классификация одежды методами глубокого обучения
+<img src="https://img.shields.io/badge/Python-3.12-blue?style=for-the-badge&logo=python&logoColor=white"/>
+<img src="https://img.shields.io/badge/YOLO-v26-purple?style=for-the-badge"/>
+<img src="https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white"/>
+<img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge"/>
+
+# 👕 LookCheck
+
+**ИИ который определяет тип одежды на фотографии**
+
+</div>
 
 ---
 
-## 📌 Описание
+## ✨ Возможности
 
-LookCheck — программное решение для многоклассовой классификации предметов одежды на основе свёрточных нейронных сетей. Модель обучена распознавать 6 категорий: кофта, штаны, обувь, кепка, футболка.
+- 🔍 **Определение одежды** — находит и классифицирует одежду на фото
+- 📊 **Уверенность модели** — показывает процент уверенности с прогресс-баром
+- 🕐 **История запросов** — сохраняет все предыдущие анализы
+- 🌙 **Тёмная/светлая тема** — переключение одной кнопкой
+- ⚡ **Быстрый анализ** — результат за доли секунды
 
-## 🧠 Архитектура
+---
 
-Собственная CNN-модель, построенная на базе TensorFlow/Keras. Оптимизация под высокую скорость инференса при сохранении точности >94%.
+## 🎯 Классы одежды
 
-## 📊 Ключевые показатели
+| Класс | Описание |
+|-------|----------|
+| 👕 T-shirt | Футболка |
+| 👖 Trousers | Брюки |
+| 👟 Shoes | Обувь |
+| 🧥 Longsliva | Лонгслив |
+| 🎩 Hat | Шапка/кепка |
+| 👗 Dress | Платье |
+| 🩳 Shorts | Шорты |
+| 🧣 Skirt | Юбка |
 
-- **Accuracy:** 0.942
-- **Loss (Categorical Crossentropy):** 0.18
-- **Параметров модели:** ~2.3 млн
+---
 
-## 🛠 Стек
+## 🛠️ Технологии
 
-`Python 3` `TensorFlow 2.x` `Keras` `NumPy` `OpenCV` `Matplotlib` `Scikit-learn`
+- **YOLO v26** — детекция и классификация объектов
+- **FastAPI** — бэкенд сервер
+- **HTML/CSS/JS** — фронтенд
+- **Python 3.12** — язык программирования
 
-## 🚀 Запуск
+---
+
+## 🚀 Установка
+
+### 1. Клонируй репозиторий
+```bash
+git clone https://github.com/DikiyPipka69/project.git
+cd project
+```
+
+### 2. Создай окружение
+```bash
+conda create -n ai_academy python=3.12
+conda activate ai_academy
+```
+
+### 3. Установи зависимости
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Запусти сервер
+```bash
+python main.py
+```
+
+### 5. Открой браузер
+http://127.0.0.1:8000
+
+---
+
+## 🎓 Как обучить модель самому
 
 ```bash
-git clone https://github.com/username/LookCheck
-cd LookCheck
-pip install -r requirements.txt
-python main.py --mode predict --source test_image.jpg
+python train.py
+```
+
+Модель обучается на датасете в папке `dataset/`. После обучения веса сохраняются в `runs/detect/`.
+
+---
+
+## 📄 Лицензия
+
+Проект распространяется под лицензией [MIT](LICENSE).
+
+---
+
+<div align="center">
+Сделано с ❤️
+</div>
