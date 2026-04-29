@@ -78,21 +78,6 @@ http://127.0.0.1:8000
 
 ---
 
-## 📁 Структура проекта
-LookChecker/
-├── static/
-│   ├── style.css       # стили
-│   └── script.js       # логика фронтенда
-├── templates/
-│   └── index.html      # главная страница
-├── dataset/            # датасет (не включён в репо)
-├── runs/               # веса модели после обучения
-├── main.py             # FastAPI сервер
-├── train.py            # обучение модели
-├── requirements.txt
-└── README.md
----
-
 ## 🎓 Как обучить модель самому
 
 ```bash
