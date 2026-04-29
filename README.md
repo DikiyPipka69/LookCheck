@@ -94,4 +94,3 @@ python train.py
 
 <div align="center">
 Сделано с ❤️
-</div>
