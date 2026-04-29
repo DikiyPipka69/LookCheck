@@ -30,3 +30,5 @@ runs/detect/train12/
 runs/detect/train13/
 runs/detect/train14/
 runs/detect/train15/
+
+yolo26n.pt
