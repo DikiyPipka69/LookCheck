@@ -9,15 +9,23 @@ const loader = document.getElementById('loader');
 
 let selectedFile = null;
 
-// Клик по зоне загрузки
+// Меняем начальный HTML контента загрузки (без кнопки)
+uploadContent.innerHTML = `
+    <div class="upload-icon">⬆️</div>
+    <p class="upload-title">Загрузите или перетащите фото сюда</p>
+    <p class="upload-hint">Поддерживаются JPG, PNG, WebP. Чем чётче фото, тем точнее результат.</p>
+`;
+
+// Клик по зоне загрузки — всегда открывает диалог выбора файла
 uploadZone.addEventListener('click', () => {
-    if (!previewImage.classList.contains('hidden')) return;
     fileInput.click();
 });
 
 // Выбор файла
 fileInput.addEventListener('change', (e) => {
-    handleFile(e.target.files[0]);
+    if (e.target.files[0]) {
+        handleFile(e.target.files[0]);
+    }
 });
 
 // Drag & Drop
@@ -32,8 +40,11 @@ uploadZone.addEventListener('dragleave', () => {
 
 uploadZone.addEventListener('drop', (e) => {
     e.preventDefault();
+    e.stopPropagation();
     uploadZone.classList.remove('dragover');
-    handleFile(e.dataTransfer.files[0]);
+    if (e.dataTransfer.files[0]) {
+        handleFile(e.dataTransfer.files[0]);
+    }
 });
 
 function handleFile(file) {
@@ -44,10 +55,18 @@ function handleFile(file) {
     reader.onload = (e) => {
         previewImage.src = e.target.result;
         previewImage.classList.remove('hidden');
-        uploadContent.classList.add('hidden');
+
+        // Меняем текст в uploadContent на подсказку о повторной загрузке (без кнопки)
+        uploadContent.innerHTML = `
+            <div class="upload-icon">🔄</div>
+            <p class="upload-title">Фото загружено</p>
+            <p class="upload-hint">Перетащите или загрузите новое фото</p>
+        `;
+
         analyzeBtn.classList.remove('hidden');
         results.classList.add('hidden');
         resultsList.innerHTML = '';
+        uploadZone.classList.remove('dragover');
     };
     reader.readAsDataURL(file);
 }
@@ -103,7 +122,7 @@ function showResults(detections) {
         });
 
         setTimeout(() => {
-            document.querySelectorAll('.progress-bar-fill').forEach(bar => {
+document.querySelectorAll('.progress-bar-fill').forEach(bar => {
                 bar.style.width = bar.dataset.width + '%';
             });
         }, 50);
@@ -170,12 +189,10 @@ async function loadHistory() {
     }
 }
 
-
 // Тёмная/светлая тема
 const themeBtn = document.getElementById('themeBtn');
 const body = document.body;
 
-// Загрузить сохранённую тему
 if (localStorage.getItem('theme') === 'light') {
     body.classList.add('light');
     themeBtn.textContent = '🌙';
