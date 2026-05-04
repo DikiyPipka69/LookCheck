@@ -9,26 +9,26 @@ const loader = document.getElementById('loader');
 
 let selectedFile = null;
 
-// Меняем начальный HTML контента загрузки (без кнопки)
+// смена начального HTML контента загрузки без кнопки
 uploadContent.innerHTML = `
     <div class="upload-icon">⬆️</div>
     <p class="upload-title">Загрузите или перетащите фото сюда</p>
     <p class="upload-hint">Поддерживаются JPG, PNG, WebP. Чем чётче фото, тем точнее результат.</p>
 `;
 
-// Клик по зоне загрузки — всегда открывает диалог выбора файла
+// клик по зоне загрузки открывает проводник
 uploadZone.addEventListener('click', () => {
     fileInput.click();
 });
 
-// Выбор файла
+// выбор файла
 fileInput.addEventListener('change', (e) => {
     if (e.target.files[0]) {
         handleFile(e.target.files[0]);
     }
 });
 
-// Drag & Drop
+// drag & drop
 uploadZone.addEventListener('dragover', (e) => {
     e.preventDefault();
     uploadZone.classList.add('dragover');
@@ -71,7 +71,7 @@ function handleFile(file) {
     reader.readAsDataURL(file);
 }
 
-// Отправка на сервер
+// отправка на сервер
 analyzeBtn.addEventListener('click', async () => {
     if (!selectedFile) return;
 
@@ -91,7 +91,7 @@ analyzeBtn.addEventListener('click', async () => {
         const data = await response.json();
         showResults(data.detections);
     } catch (err) {
-        resultsList.innerHTML = '<p style="color: #ef4444">Ошибка. Попробуй снова.</p>';
+        resultsList.innerHTML = '<p style="color: #ef4444">Ошибка. Повторите попытку позже</p>';
         results.classList.remove('hidden');
     } finally {
         loader.classList.add('hidden');
