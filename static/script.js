@@ -204,3 +204,60 @@ themeBtn.addEventListener('click', () => {
     themeBtn.textContent = isLight ? '🌙' : '☀️';
     localStorage.setItem('theme', isLight ? 'light' : 'dark');
 });
+
+// Мультиязычность
+const translations = {
+    ru: {
+        title: "Определение одежды",
+        subtitle: "Загрузите фото — ИИ определит тип и цвет одежды и выделит её на изображении.",
+        uploadTitle: "Перетащите фото сюда",
+        uploadHint: "Поддерживаются JPG, PNG, WebP. Чем чётче фото, тем точнее результат.",
+        chooseBtn: "Выбрать файл",
+        analyzeBtn: "🔍 Определить одежду",
+        resultsTitle: "Результат анализа",
+        analyzing: "Анализируем...",
+        history: "История",
+        emptyHistory: "История пуста",
+        footer: "Умное распознавание одежды с помощью ИИ",
+        notFound: "Ничего не найдено",
+        error: "Ошибка. Попробуй снова."
+    },
+    en: {
+        title: "Clothing Detection",
+        subtitle: "Upload a photo — AI will detect the type and color of clothing.",
+        uploadTitle: "Drag & drop photo here",
+        uploadHint: "Supports JPG, PNG, WebP. The clearer the photo, the better the result.",
+        chooseBtn: "Choose file",
+        analyzeBtn: "🔍 Detect clothing",
+        resultsTitle: "Analysis result",
+        analyzing: "Analyzing...",
+        history: "History",
+        emptyHistory: "History is empty",
+        footer: "Smart clothing recognition powered by AI",
+        notFound: "Nothing found",
+        error: "Error. Please try again."
+    }
+};
+
+const langBtn = document.getElementById('langBtn');
+let currentLang = localStorage.getItem('lang') || 'ru';
+
+function applyTranslations(lang) {
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (translations[lang][key]) {
+            el.textContent = translations[lang][key];
+        }
+    });
+    langBtn.textContent = lang === 'ru' ? 'EN' : 'RU';
+    document.documentElement.lang = lang;
+}
+
+// Применить при загрузке
+applyTranslations(currentLang);
+
+langBtn.addEventListener('click', () => {
+    currentLang = currentLang === 'ru' ? 'en' : 'ru';
+    localStorage.setItem('lang', currentLang);
+    applyTranslations(currentLang);
+});

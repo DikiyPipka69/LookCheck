@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
+    <!-- NAVBAR -->
     <nav class="navbar">
         <a class="logo" href="/">
             <div class="logo-icon">
@@ -16,62 +17,59 @@
                     <path d="M11 8v6M8 11h6"/>
                 </svg>
             </div>
-            <span>LookCheck</span>
+            <span>LookChecker</span>
         </a>
         <div class="navbar-right">
+            <button class="lang-btn" id="langBtn">EN</button>
             <button class="theme-btn" id="themeBtn">☀️</button>
-            <button class="history-btn" id="historyBtn">🕐 История</button>
+            <button class="history-btn" id="historyBtn">🕐 <span data-i18n="history">История</span></button>
         </div>
     </nav>
 
     <main>
-        <h1>Определение одежды</h1>
-        <p class="subtitle">Загрузите фото — ИИ определит тип и цвет одежды и выделит её на изображении.</p>
+        <h1 data-i18n="title">Определение одежды</h1>
+        <p class="subtitle" data-i18n="subtitle">Загрузите фото — ИИ определит тип и цвет одежды и выделит её на изображении.</p>
 
         <div class="upload-zone" id="uploadZone">
             <div class="upload-content" id="uploadContent">
                 <div class="upload-icon">⬆️</div>
-                <p class="upload-title">Перетащите фото сюда</p>
-                <p class="upload-hint">Поддерживаются JPG, PNG, WebP. Чем чётче фото, тем точнее результат.</p>
-                <button class="choose-btn" onclick="document.getElementById('fileInput').click()">
-                    Выбрать файл
-                </button>
+                <p class="upload-title" data-i18n="uploadTitle">Перетащите фото сюда</p>
+                <p class="upload-hint" data-i18n="uploadHint">Поддерживаются JPG, PNG, WebP. Чем чётче фото, тем точнее результат.</p>
+                <button class="choose-btn" onclick="document.getElementById('fileInput').click()" data-i18n="chooseBtn">Выбрать файл</button>
             </div>
             <img id="previewImage" class="preview-image hidden" alt="preview">
         </div>
 
         <input type="file" id="fileInput" accept="image/*" hidden>
 
-        <button class="analyze-btn hidden" id="analyzeBtn">
-            🔍 Определить одежду
-        </button>
+        <button class="analyze-btn hidden" id="analyzeBtn" data-i18n="analyzeBtn">🔍 Определить одежду</button>
 
         <div class="results hidden" id="results">
-            <h2>Результат анализа</h2>
+            <h2 data-i18n="resultsTitle">Результат анализа</h2>
             <div id="resultsList"></div>
         </div>
 
-        <div class="loader hidden" id="loader">
-            <div class="spinner"></div>
-            <p>Анализируем...</p>
-        </div>
+<div class="loader hidden" id="loader">
+    <div class="spinner"></div>
+    <p data-i18n="analyzing">Анализируем...</p>
+</div>
     </main>
 
     <!-- ПАНЕЛЬ ИСТОРИИ -->
     <div class="history-panel hidden" id="historyPanel">
         <div class="history-header">
-            <h2>🕐 История запросов</h2>
+            <h2>🕐 <span data-i18n="history">История</span></h2>
             <button class="close-btn" id="closeHistory">✕</button>
         </div>
         <div id="historyList">
-            <p class="empty-history">История пуста</p>
+            <p class="empty-history" data-i18n="emptyHistory">История пуста</p>
         </div>
     </div>
 
 <div class="overlay hidden" id="overlay"></div>
     <footer>
-        <p>Умное распознавание одежды с помощью ИИ</p>
-    </footer>
+    <p data-i18n="footer">Умное распознавание одежды с помощью ИИ</p>
+</footer>
 
     <script src="/static/script.js"></script>
 </body>
