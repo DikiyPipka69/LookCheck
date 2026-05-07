@@ -8,6 +8,7 @@ const resultsList = document.getElementById('resultsList');
 const loader = document.getElementById('loader');
 
 let selectedFile = null;
+let isProcessed = false; // флаг, обработано ли уже текущее фото
 
 // смена начального HTML контента загрузки без кнопки
 uploadContent.innerHTML = `
@@ -50,6 +51,7 @@ uploadZone.addEventListener('drop', (e) => {
 function handleFile(file) {
     if (!file) return;
     selectedFile = file;
+    isProcessed = false; // сбрасываем флаг обработки для нового фото
 
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -63,7 +65,10 @@ function handleFile(file) {
             <p class="upload-hint">Перетащите или загрузите новое фото</p>
         `;
 
+        // Возвращаем кнопке исходное состояние
         analyzeBtn.classList.remove('hidden');
+        analyzeBtn.disabled = false;
+        analyzeBtn.innerHTML = getAnalyzeBtnText();
         results.classList.add('hidden');
         resultsList.innerHTML = '';
         uploadZone.classList.remove('dragover');
@@ -71,13 +76,20 @@ function handleFile(file) {
     reader.readAsDataURL(file);
 }
 
+// Функция получения текста кнопки в зависимости от языка
+function getAnalyzeBtnText() {
+    const currentLang = localStorage.getItem('lang') || 'ru';
+    return currentLang === 'ru' ? '🔍 Определить одежду' : '🔍 Detect clothing';
+}
+
 // отправка на сервер
 analyzeBtn.addEventListener('click', async () => {
-    if (!selectedFile) return;
+    if (!selectedFile || isProcessed) return; // если уже обработано - не запускаем
 
     loader.classList.remove('hidden');
     results.classList.add('hidden');
     analyzeBtn.disabled = true;
+    analyzeBtn.innerHTML = currentLang === 'ru' ? '⏳ Обработка...' : '⏳ Processing...';
 
     const formData = new FormData();
     formData.append('file', selectedFile);
@@ -90,12 +102,18 @@ analyzeBtn.addEventListener('click', async () => {
 
         const data = await response.json();
         showResults(data.detections);
+        
+        // После успешной обработки деактивируем кнопку навсегда (до нового фото)
+        isProcessed = true;
+        analyzeBtn.disabled = true;
+        analyzeBtn.innerHTML = currentLang === 'ru' ? '✅ Обработка завершена' : '✅ Processing completed';
     } catch (err) {
         resultsList.innerHTML = '<p style="color: #ef4444">Ошибка. Повторите попытку позже</p>';
         results.classList.remove('hidden');
+        analyzeBtn.disabled = false;
+        analyzeBtn.innerHTML = getAnalyzeBtnText();
     } finally {
         loader.classList.add('hidden');
-        analyzeBtn.disabled = false;
     }
 });
 
@@ -122,7 +140,7 @@ function showResults(detections) {
         });
 
         setTimeout(() => {
-document.querySelectorAll('.progress-bar-fill').forEach(bar => {
+            document.querySelectorAll('.progress-bar-fill').forEach(bar => {
                 bar.style.width = bar.dataset.width + '%';
             });
         }, 50);
@@ -192,6 +210,7 @@ async function loadHistory() {
 // Тёмная/светлая тема
 const themeBtn = document.getElementById('themeBtn');
 const body = document.body;
+let currentLang = localStorage.getItem('lang') || 'ru';
 
 if (localStorage.getItem('theme') === 'light') {
     body.classList.add('light');
@@ -209,10 +228,9 @@ themeBtn.addEventListener('click', () => {
 const translations = {
     ru: {
         title: "Определение одежды",
-        subtitle: "Загрузите фото — ИИ определит тип и цвет одежды и выделит её на изображении.",
-        uploadTitle: "Перетащите фото сюда",
+        subtitle: "Загрузите фото — ИИ определит тип одежды и выделит её на изображении.",
+        uploadTitle: "Загрузите или перетащите фото сюда",
         uploadHint: "Поддерживаются JPG, PNG, WebP. Чем чётче фото, тем точнее результат.",
-        chooseBtn: "Выбрать файл",
         analyzeBtn: "🔍 Определить одежду",
         resultsTitle: "Результат анализа",
         analyzing: "Анализируем...",
@@ -220,14 +238,15 @@ const translations = {
         emptyHistory: "История пуста",
         footer: "Умное распознавание одежды с помощью ИИ",
         notFound: "Ничего не найдено",
-        error: "Ошибка. Попробуй снова."
+        error: "Ошибка. Повторите попытку позже",
+        processing: "⏳ Обработка...",
+        completed: "✅ Обработка завершена"
     },
     en: {
         title: "Clothing Detection",
-        subtitle: "Upload a photo — AI will detect the type and color of clothing.",
-        uploadTitle: "Drag & drop photo here",
+        subtitle: "Upload a photo — AI will detect the type of clothing.",
+        uploadTitle: "Upload or drag & drop photo here",
         uploadHint: "Supports JPG, PNG, WebP. The clearer the photo, the better the result.",
-        chooseBtn: "Choose file",
         analyzeBtn: "🔍 Detect clothing",
         resultsTitle: "Analysis result",
         analyzing: "Analyzing...",
@@ -235,12 +254,13 @@ const translations = {
         emptyHistory: "History is empty",
         footer: "Smart clothing recognition powered by AI",
         notFound: "Nothing found",
-        error: "Error. Please try again."
+        error: "Error. Please try again",
+        processing: "⏳ Processing...",
+        completed: "✅ Processing completed"
     }
 };
 
 const langBtn = document.getElementById('langBtn');
-let currentLang = localStorage.getItem('lang') || 'ru';
 
 function applyTranslations(lang) {
     document.querySelectorAll('[data-i18n]').forEach(el => {
@@ -249,6 +269,16 @@ function applyTranslations(lang) {
             el.textContent = translations[lang][key];
         }
     });
+    
+    // Обновляем текст кнопки анализа, если она не в специальном состоянии
+    if (!isProcessed && analyzeBtn.disabled === false) {
+        analyzeBtn.innerHTML = translations[lang].analyzeBtn;
+    } else if (isProcessed) {
+        analyzeBtn.innerHTML = translations[lang].completed;
+    } else if (analyzeBtn.disabled === true && !isProcessed) {
+        analyzeBtn.innerHTML = translations[lang].processing;
+    }
+    
     langBtn.textContent = lang === 'ru' ? 'EN' : 'RU';
     document.documentElement.lang = lang;
 }
