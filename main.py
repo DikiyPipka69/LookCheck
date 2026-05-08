@@ -12,17 +12,24 @@ from PIL import Image
 
 app = FastAPI()
 
+# обученная модель YOLO
 model = YOLO("runs/detect/train/weights/best.pt")
 
+# подключаем папку со статикой (css, js)
 app.mount("/static", StaticFiles(directory="static"), name="static")
+
+# подключаем шаблоны html
 templates = Jinja2Templates(directory="templates")
 
+# хранилище истории запросов в памяти
 history = []
 
+# главная страница
 @app.get("/")
 async def index(request: Request):
     return templates.TemplateResponse(request, "index.html", {})
 
+# эндпоинт для определения одежды на фото
 @app.post("/detect")
 async def detect(file: UploadFile = File(...)):
     # читаем файл в память
@@ -36,6 +43,7 @@ async def detect(file: UploadFile = File(...)):
     image = Image.open(io.BytesIO(contents))
     results = model(image)
 
+    # собираем результаты детекции
     detections = []
     for r in results:
         for box in r.boxes:
@@ -44,6 +52,7 @@ async def detect(file: UploadFile = File(...)):
                 "confidence": round(float(box.conf[0]) * 100, 1)
             })
 
+    # сохраняем запрос в историю
     history.append({
         "id": uuid.uuid4().hex,
         "time": datetime.now().strftime("%H:%M %d.%m.%Y"),
@@ -52,12 +61,15 @@ async def detect(file: UploadFile = File(...)):
         "detections": detections
     })
 
+    # возвращаем результат на фронтенд
     return {"detections": detections}
 
+# получаем истории
 @app.get("/history")
 async def get_history():
     return JSONResponse(content={"history": list(reversed(history))})
 
+# конструкция чтобы uvicorn работал пока не выключат
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=False)
