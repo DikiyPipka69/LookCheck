@@ -12,7 +12,7 @@ from PIL import Image
 
 app = FastAPI()
 
-model = YOLO("runs/detect/train13/weights/best.pt")
+model = YOLO("runs/detect/train/weights/best.pt")
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
