@@ -29,10 +29,10 @@
 |-------|----------|
 | 👕 T-shirt | Футболка |
 | 👖 Trousers | Брюки |
-| 👟 Shoes | Обувь |
-| 🧥 Longsliva | Лонгслив |
+| 🧥 Hoodie | Худи |
+| 🥼 Longsliva | Лонгслив |
 | 🎩 Hat | Шапка/кепка |
-| 👗 Dress | Платье |
+| 👚 Polo | Поло |
 | 🩳 Shorts | Шорты |
 | 🧣 Skirt | Юбка |
 
@@ -57,8 +57,8 @@ cd project
 
 ### 2. Создай окружение
 ```bash
-conda create -n ai_academy python=3.12
-conda activate ai_academy
+conda create -n LookCheck python=3.12
+conda activate LookCheck
 ```
 
 ### 3. Установи зависимости
@@ -82,7 +82,8 @@ http://127.0.0.1:8000
 python train.py
 ```
 
-Модель обучается на датасете в папке `dataset/`. После обучения веса сохраняются в `runs/detect/`.
+Модель обучается на датасете в папке `dataset/`.
+После обучения веса сохраняются в `runs/detect/`.
 
 ---
 

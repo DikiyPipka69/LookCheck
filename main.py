@@ -25,14 +25,14 @@ async def index(request: Request):
 
 @app.post("/detect")
 async def detect(file: UploadFile = File(...)):
-    # Читаем файл в память
+    # читаем файл в память
     contents = await file.read()
     
-    # Конвертируем в base64 для превью
+    # фигачим в base64 для превью
     image_b64 = base64.b64encode(contents).decode("utf-8")
     image_url = f"data:image/jpeg;base64,{image_b64}"
 
-    # Прогоняем через модель из памяти
+    # прогоняем через модель из памяти
     image = Image.open(io.BytesIO(contents))
     results = model(image)
 
