@@ -4,21 +4,19 @@ from fastapi.templating import Jinja2Templates
 from fastapi.requests import Request
 from fastapi.responses import JSONResponse
 from ultralytics import YOLO
-import shutil
 import uuid
-import os
+import base64
+import io
 from datetime import datetime
+from PIL import Image
 
-# инициализация приложения
 app = FastAPI()
 
-# модель
 model = YOLO("runs/detect/train13/weights/best.pt")
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
-# история запросов
 history = []
 
 @app.get("/")
@@ -27,12 +25,16 @@ async def index(request: Request):
 
 @app.post("/detect")
 async def detect(file: UploadFile = File(...)):
-    temp_path = f"temp_{uuid.uuid4().hex}.jpg"
-    with open(temp_path, "wb") as f:
-        shutil.copyfileobj(file.file, f)
+    # Читаем файл в память
+    contents = await file.read()
+    
+    # Конвертируем в base64 для превью
+    image_b64 = base64.b64encode(contents).decode("utf-8")
+    image_url = f"data:image/jpeg;base64,{image_b64}"
 
-    results = model(temp_path)
-    os.remove(temp_path)
+    # Прогоняем через модель из памяти
+    image = Image.open(io.BytesIO(contents))
+    results = model(image)
 
     detections = []
     for r in results:
@@ -42,23 +44,20 @@ async def detect(file: UploadFile = File(...)):
                 "confidence": round(float(box.conf[0]) * 100, 1)
             })
 
-    # функция которая сохраняет историю
     history.append({
         "id": uuid.uuid4().hex,
         "time": datetime.now().strftime("%H:%M %d.%m.%Y"),
         "filename": file.filename,
+        "image_url": image_url,
         "detections": detections
     })
 
     return {"detections": detections}
 
-# ручка для получения истории
 @app.get("/history")
 async def get_history():
     return JSONResponse(content={"history": list(reversed(history))})
 
-# конструкция чтобы uvicorn работал пока не выключат
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=False)
-
