@@ -12,7 +12,7 @@ from PIL import Image
 
 app = FastAPI()
 
-# обученная модель YOLO
+# обученная моделька YOLO
 model = YOLO("runs/detect/train/weights/best.pt")
 
 # подключаем папку со статикой (css, js)
@@ -41,15 +41,16 @@ async def detect(file: UploadFile = File(...)):
 
     # прогоняем через модель из памяти
     image = Image.open(io.BytesIO(contents))
-    results = model(image)
+    results = model(image, conf=0.2, iou=0.7)
 
     # собираем результаты детекции
     detections = []
     for r in results:
-        for box in r.boxes:
+        if len(r.boxes) > 0:
+            best_box = max(r.boxes, key=lambda b: float(b.conf[0]))
             detections.append({
-                "class": model.names[int(box.cls[0])],
-                "confidence": round(float(box.conf[0]) * 100, 1)
+                "class": model.names[int(best_box.cls[0])],
+                "confidence": round(float(best_box.conf[0]) * 100, 1)
             })
 
     # сохраняем запрос в историю
