@@ -13,7 +13,7 @@ from PIL import Image
 app = FastAPI()
 
 # обученная моделька YOLO
-model = YOLO("runs/detect/train/weights/best.pt")
+model = YOLO("runs/detect/train3/weights/best.pt")
 
 # подключаем папку со статикой (css, js)
 app.mount("/static", StaticFiles(directory="static"), name="static")
