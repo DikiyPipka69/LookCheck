@@ -168,6 +168,14 @@ function showResults(detections) {
             const item = document.createElement('div');
             item.className = 'result-item';
             item.style.animationDelay = `${i * 0.1}s`;
+
+            const query = encodeURIComponent(d.class);
+            const markets = [
+                { name: 'Wildberries', url: `https://www.wildberries.ru/catalog/0/search.aspx?search=${query}`, color: '#cb11ab' },
+                { name: 'Ozon', url: `https://www.ozon.ru/search/?text=${query}`, color: '#005bff' },
+                { name: 'Яндекс', url: `https://market.yandex.ru/search?text=${query}`, color: '#ffcc00' },
+            ];
+
             item.innerHTML = `
                 <div class="result-top">
                     <span class="result-class">👗 ${d.class}</span>
@@ -175,6 +183,13 @@ function showResults(detections) {
                 </div>
                 <div class="progress-bar-bg">
                     <div class="progress-bar-fill" data-width="${d.confidence}"></div>
+                </div>
+                <div class="market-links">
+                    ${markets.map(m => `
+                        <a href="${m.url}" target="_blank" class="market-btn" style="border-color:${m.color};color:${m.color}">
+                            ${m.name}
+                        </a>
+                    `).join('')}
                 </div>
             `;
             resultsList.appendChild(item);
