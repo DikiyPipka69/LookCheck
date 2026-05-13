@@ -95,21 +95,36 @@ class ClothingDetector:
 
         return "неизвестный"
     
-    def detect(self, image: Image.Image) -> list:
+    def detect(self, image: Image.Image) -> tuple:
         results = self.model(image, conf=0.5, iou=0.7)
         detections = []
+        boxes_data = []
 
         for r in results:
             if len(r.boxes) > 0:
                 best_box = max(r.boxes, key=lambda b: float(b.conf[0]))
                 color = self.get_color(image, best_box)
+                
+                # координаты рамки
+                x1, y1, x2, y2 = map(int, best_box.xyxy[0])
+                img_w, img_h = image.size
+                
                 detections.append({
                     "class": self.model.names[int(best_box.cls[0])],
                     "confidence": round(float(best_box.conf[0]) * 100, 1),
                     "color": color
                 })
+                
+                # нормализованные координаты (0-1) для фронтенда
+                boxes_data.append({
+                    "x1": x1 / img_w,
+                    "y1": y1 / img_h,
+                    "x2": x2 / img_w,
+                    "y2": y2 / img_h,
+                    "label": f"{self.model.names[int(best_box.cls[0])]} ({color}) {round(float(best_box.conf[0]) * 100, 1)}%"
+                })
 
-        return detections
+        return detections, boxes_data
     
     def get_class_names(self) -> list:
         # возвращаем список всех классов модели
@@ -168,24 +183,16 @@ async def index(request: Request):
 # эндпоинт для определения одежды на фото
 @app.post("/detect")
 async def detect(file: UploadFile = File(...)):
-    # читаем файл в память
     contents = await file.read()
-
-    # конвертируем в base64 для превью в истории
     image_b64 = base64.b64encode(contents).decode("utf-8")
     image_url = f"data:image/jpeg;base64,{image_b64}"
-
-    # открываем фото через pillow из памяти
     image = Image.open(io.BytesIO(contents))
 
-    # прогоняем через детектор
-    detections = detector.detect(image)
+    detections, boxes_data = detector.detect(image)
 
-    # сохраняем в историю
     history_manager.add(file.filename, image_url, detections)
 
-    # возвращаем результат на фронтенд
-    return {"detections": detections}
+    return {"detections": detections, "boxes": boxes_data}
 
 
 # эндпоинт для получения истории запросов

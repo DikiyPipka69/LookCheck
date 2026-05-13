@@ -700,11 +700,11 @@ body.light .history-card-bar {
     transition: all 0.2s;
     font-family: 'Inter', sans-serif;
 }
-
 .share-btn:hover {
     background: #4c1d95;
     color: white;
 }
+
 
 /* УВЕДОМЛЕНИЕ */
 .toast {
@@ -722,8 +722,22 @@ body.light .history-card-bar {
     transition: all 0.3s ease;
     z-index: 999;
 }
-
 .toast.show {
     opacity: 1;
     transform: translateX(-50%) translateY(0);
+}
+
+
+/* CANVAS С РАМКАМИ */
+.canvas-wrapper {
+    width: 100%;
+    border-radius: 12px;
+    overflow: hidden;
+}
+#resultCanvas {
+    width: 100%;
+    height: auto;
+    border-radius: 12px;
+    display: block;
+    animation: fadeInBlur 0.5s ease;
 }

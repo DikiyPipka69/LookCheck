@@ -115,6 +115,7 @@ function handleFile(file) {
 
     const reader = new FileReader();
     reader.onload = (e) => {
+        document.getElementById('canvasWrapper').classList.add('hidden');
         previewImage.src = e.target.result;
         previewImage.classList.remove('hidden');
         uploadContent.innerHTML = `
@@ -149,6 +150,10 @@ analyzeBtn.addEventListener('click', async () => {
         });
         const data = await response.json();
         showResults(data.detections);
+        // рисуем рамки на фото
+        if (data.boxes && data.boxes.length > 0) {
+            drawBoxes(previewImage.src, data.boxes);
+        }
         isProcessed = true;
         analyzeBtn.disabled = true;
         analyzeBtn.innerHTML = t('completed');
@@ -212,6 +217,62 @@ function showResults(detections) {
     results.classList.remove('hidden');
 }
 
+
+// ФУНКЦИЯ РИСОВАНИЯ РАМОК
+function drawBoxes(imageUrl, boxes) {
+    const canvas = document.getElementById('resultCanvas');
+    const wrapper = document.getElementById('canvasWrapper');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+
+    img.onload = () => {
+        // размер канваса = размер фото
+        canvas.width = img.width;
+        canvas.height = img.height;
+
+        // рисуем фото
+        ctx.drawImage(img, 0, 0);
+
+        // рисуем каждую рамку
+        boxes.forEach(box => {
+            const x1 = box.x1 * img.width;
+            const y1 = box.y1 * img.height;
+            const x2 = box.x2 * img.width;
+            const y2 = box.y2 * img.height;
+            const w = x2 - x1;
+            const h = y2 - y1;
+
+            // рамка
+            ctx.strokeStyle = '#a855f7';
+            ctx.lineWidth = Math.max(2, img.width / 200);
+            ctx.strokeRect(x1, y1, w, h);
+
+            // фон подписи
+            const fontSize = Math.max(14, img.width / 40);
+            ctx.font = `bold ${fontSize}px Inter, sans-serif`;
+            const textWidth = ctx.measureText(box.label).width;
+            const padding = fontSize * 0.4;
+            const labelH = fontSize + padding * 2;
+
+            ctx.fillStyle = '#7c3aed';
+            ctx.beginPath();
+            ctx.roundRect(x1, y1 - labelH, textWidth + padding * 2, labelH, 4);
+            ctx.fill();
+
+            // текст подписи
+            ctx.fillStyle = '#ffffff';
+            ctx.fillText(box.label, x1 + padding, y1 - padding);
+        });
+
+        // показываем канвас вместо обычного превью
+        wrapper.classList.remove('hidden');
+        previewImage.classList.add('hidden');
+    };
+
+    img.src = imageUrl;
+}
+
+
 // НАВИГАЦИЯ
 const mainPage = document.getElementById('mainPage');
 const historyPage = document.getElementById('historyPage');
@@ -237,6 +298,7 @@ document.querySelector('.logo').addEventListener('click', (e) => {
     isProcessed = false;
     previewImage.classList.add('hidden');
     previewImage.src = '';
+    document.getElementById('canvasWrapper').classList.add('hidden');
     analyzeBtn.classList.add('hidden');
     analyzeBtn.disabled = false;
     analyzeBtn.innerHTML = t('analyzeBtn');
