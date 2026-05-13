@@ -686,3 +686,44 @@ body.light .history-card-bar {
     opacity: 0.7;
     transform: translateY(-1px);
 }
+
+
+/* КНОПКА ПОДЕЛИТЬСЯ */
+.share-btn {
+    background: transparent;
+    border: 1px solid #4c1d95;
+    color: #a855f7;
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-size: 0.8em;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Inter', sans-serif;
+}
+
+.share-btn:hover {
+    background: #4c1d95;
+    color: white;
+}
+
+/* УВЕДОМЛЕНИЕ */
+.toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: #1a1a2e;
+    border: 1px solid #7c3aed;
+    color: #e0e0e0;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-size: 0.9em;
+    opacity: 0;
+    transition: all 0.3s ease;
+    z-index: 999;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}

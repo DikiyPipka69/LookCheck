@@ -31,7 +31,9 @@ const translations = {
         processing: "⏳ Обработка...",
         completed: "✅ Обработка завершена",
         uploaded: "Фото загружено",
-        uploadedHint: "Перетащите или загрузите новое фото"
+        uploadedHint: "Перетащите или загрузите новое фото",
+        share: "Поделиться",
+        copied: "Скопировано в буфер обмена",
     },
     en: {
         title: "Clothing Detection",
@@ -51,7 +53,9 @@ const translations = {
         processing: "⏳ Processing...",
         completed: "✅ Processing completed",
         uploaded: "Photo uploaded",
-        uploadedHint: "Drag & drop or upload a new photo"
+        uploadedHint: "Drag & drop or upload a new photo",
+        share: "Share",
+        copied: "Copied to clipboard",
     }
 };
 
@@ -190,6 +194,9 @@ function showResults(detections) {
                             ${m.name}
                         </a>
                     `).join('')}
+                    <button class="share-btn" onclick="shareResult('${d.class}', '${d.color}', '${d.confidence}', '${markets[0].url}', '${markets[1].url}', '${markets[2].url}')">
+                        📤 ${currentLang === 'ru' ? 'Поделиться' : 'Share'}
+                    </button>
                 </div>
             `;
             resultsList.appendChild(item);
@@ -351,3 +358,29 @@ document.querySelectorAll('[data-i18n-dynamic]').forEach(el => {
         el.textContent = translations[lang][key];
     }
 });
+
+// ПОДЕЛИТЬСЯ РЕЗУЛЬТАТАМИ
+function shareResult(className, color, confidence, wbUrl, ozonUrl, yaUrl) {
+    const text = `👗 LookChecker — результат анализа\n\n` +
+        `Тип одежды: ${className}\n` +
+        `Цвет: ${color}\n` +
+        `Уверенность: ${confidence}%\n\n` +
+        `🛍️ Найти похожее:\n` +
+        `• Wildberries: ${wbUrl}\n` +
+        `• Ozon: ${ozonUrl}\n` +
+        `• Яндекс Маркет: ${yaUrl}\n\n` +
+        `🔗 LookChecker: http://127.0.0.1:8000`;
+
+    navigator.clipboard.writeText(text).then(() => {
+        // показываем уведомление
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.textContent = '✅ ' + t('copied');
+        document.body.appendChild(toast);
+        setTimeout(() => toast.classList.add('show'), 10);
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 300);
+        }, 2500);
+    });
+}
