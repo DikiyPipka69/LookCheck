@@ -21,83 +21,78 @@ class ClothingDetector:
         self.model = YOLO(model_path)
 
     def get_color(self, image: Image.Image, box) -> str:
-        # координаты рамки
         x1, y1, x2, y2 = map(int, box.xyxy[0])
-        
-        # берём только центральные 50% рамки чтобы избежать фона
         w = x2 - x1
         h = y2 - y1
+
+        # берём центральные 50%
         x1 = x1 + w // 4
         y1 = y1 + h // 4
         x2 = x2 - w // 4
         y2 = y2 - h // 4
-        
-        # вырезаем и уменьшаем
-        cropped = image.crop((x1, y1, x2, y2)).resize((30, 30))
-        
-        # конвертируем в HSV для более точного определения цвета
-        cropped_rgb = cropped.convert('RGB')
-        pixels = list(cropped_rgb.getdata())
-        
-        # средний цвет
-        r = sum(p[0] for p in pixels) // len(pixels)
-        g = sum(p[1] for p in pixels) // len(pixels)
-        b = sum(p[2] for p in pixels) // len(pixels)
-        
-        # нормализуем в 0-1
+
+        cropped = image.crop((x1, y1, x2, y2)).resize((50, 50))
+        pixels = list(cropped.convert('RGB').getdata())
+
+        # фильтруем телесные пиксели
+        def is_skin(r, g, b):
+            return (r > 95 and g > 40 and b > 20 and
+                    max(r, g, b) - min(r, g, b) > 15 and
+                    r > g and r > b and
+                    abs(r - g) > 15)
+
+        filtered = [p for p in pixels if not is_skin(p[0], p[1], p[2])]
+
+        # если отфильтровали слишком много — используем все пиксели
+        if len(filtered) < 20:
+            filtered = pixels
+
+        r = sum(p[0] for p in filtered) // len(filtered)
+        g = sum(p[1] for p in filtered) // len(filtered)
+        b = sum(p[2] for p in filtered) // len(filtered)
+
         rf, gf, bf = r/255, g/255, b/255
-        
         cmax = max(rf, gf, bf)
         cmin = min(rf, gf, bf)
         diff = cmax - cmin
-        
-        # считаем яркость (lightness)
         l = (cmax + cmin) / 2
-        
-        # считаем насыщенность
         s = 0 if diff == 0 else diff / (1 - abs(2*l - 1))
-        
-        # считаем оттенок (hue)
+
         if diff == 0:
-            h = 0
+            hue = 0
         elif cmax == rf:
-            h = 60 * (((gf - bf) / diff) % 6)
+            hue = 60 * (((gf - bf) / diff) % 6)
         elif cmax == gf:
-            h = 60 * (((bf - rf) / diff) + 2)
+            hue = 60 * (((bf - rf) / diff) + 2)
         else:
-            h = 60 * (((rf - gf) / diff) + 4)
-        
-        # определяем цвет по HSL
-        # сначала проверяем яркость и насыщенность
+            hue = 60 * (((rf - gf) / diff) + 4)
+
         if l < 0.15:
             return "чёрный"
         if l > 0.85:
             return "белый"
         if s < 0.12:
-            if l < 0.35:
-                return "тёмно-серый"
-            if l > 0.65:
-                return "светло-серый"
-            return "серый"
-        
-        # определяем по оттенку
-        if h < 15 or h >= 345:
+            return "серый / белый"
+
+        if hue < 15 or hue >= 345:
             return "красный"
-        if h < 40:
-            return "оранжевый"
-        if h < 70:
+        if hue < 40:
+            if l < 0.4:
+                return "коричневый"
+            return "оранжевый / бежевый"
+        if hue < 70:
             return "жёлтый"
-        if h < 150:
+        if hue < 150:
             return "зелёный"
-        if h < 195:
+        if hue < 195:
             return "голубой"
-        if h < 250:
+        if hue < 250:
             return "синий"
-        if h < 290:
+        if hue < 290:
             return "фиолетовый"
-        if h < 345:
+        if hue < 345:
             return "розовый"
-        
+
         return "неизвестный"
     
     def detect(self, image: Image.Image) -> list:
