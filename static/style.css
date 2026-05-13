@@ -830,3 +830,9 @@ body.light .history-card-bar {
 .file-size-error-close:hover {
     color: #ef4444;
 }
+
+
+.result-confidence.low {
+    color: #f59e0b;
+    font-size: 0.85em;
+}

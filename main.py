@@ -75,7 +75,7 @@ class ClothingDetector:
             return "серый / белый"
 
         if hue < 15 or hue >= 345:
-            return "красный"
+            return "красный / коричневый"
         if hue < 40:
             if l < 0.4:
                 return "коричневый"
@@ -96,32 +96,30 @@ class ClothingDetector:
         return "неизвестный"
     
     def detect(self, image: Image.Image) -> tuple:
-        results = self.model(image, conf=0.5, iou=0.7)
+        results = self.model(image)  # conf=0.5, iou=0.7
         detections = []
         boxes_data = []
 
         for r in results:
-            if len(r.boxes) > 0:
-                best_box = max(r.boxes, key=lambda b: float(b.conf[0]))
-                color = self.get_color(image, best_box)
-                
-                # координаты рамки
-                x1, y1, x2, y2 = map(int, best_box.xyxy[0])
-                img_w, img_h = image.size
-                
+            img_w, img_h = image.size
+            for box in r.boxes:
+                color = self.get_color(image, box)
+                x1, y1, x2, y2 = map(int, box.xyxy[0])
+                class_name = self.model.names[int(box.cls[0])]
+                confidence = round(float(box.conf[0]) * 100, 1)
+
                 detections.append({
-                    "class": self.model.names[int(best_box.cls[0])],
-                    "confidence": round(float(best_box.conf[0]) * 100, 1),
+                    "class": class_name,
+                    "confidence": confidence,
                     "color": color
                 })
-                
-                # нормализованные координаты (0-1) для фронтенда
+
                 boxes_data.append({
                     "x1": x1 / img_w,
                     "y1": y1 / img_h,
                     "x2": x2 / img_w,
                     "y2": y2 / img_h,
-                    "label": f"{self.model.names[int(best_box.cls[0])]} ({color}) {round(float(best_box.conf[0]) * 100, 1)}%"
+                    "label": f"{class_name} ({color}) {confidence}%"
                 })
 
         return detections, boxes_data
