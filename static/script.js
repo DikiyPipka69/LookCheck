@@ -110,6 +110,11 @@ uploadZone.addEventListener('drop', (e) => {
 
 function handleFile(file) {
     if (!file) return;
+    // проверка размера файла (макс 10МБ)
+    if (file.size > 10 * 1024 * 1024) {
+        showFileSizeError();
+        return;
+    }
     selectedFile = file;
     isProcessed = false;
 
@@ -445,4 +450,30 @@ function shareResult(className, color, confidence, wbUrl, ozonUrl, yaUrl) {
             setTimeout(() => toast.remove(), 300);
         }, 2500);
     });
+}
+
+
+// ПРЕДУПРЕЖДЕНИЕ ЕСЛИ ФАЙЛ БОЛЬШЕ 10МБ
+function showFileSizeError() {
+    const existing = document.getElementById('fileSizeError');
+    if (existing) existing.remove();
+
+    const error = document.createElement('div');
+    error.id = 'fileSizeError';
+    error.className = 'file-size-error';
+    error.innerHTML = `
+        <div class="file-size-error-icon">⚠️</div>
+        <div class="file-size-error-content">
+            <p class="file-size-error-title">${currentLang === 'ru' ? 'Файл слишком большой' : 'File too large'}</p>
+            <p class="file-size-error-text">${currentLang === 'ru' ? 'Максимальный размер — 10 МБ' : 'Maximum size — 10 MB'}</p>
+        </div>
+        <button class="file-size-error-close" onclick="this.parentElement.remove()">✕</button>
+    `;
+    document.body.appendChild(error);
+
+    setTimeout(() => error.classList.add('show'), 10);
+    setTimeout(() => {
+        error.classList.remove('show');
+        setTimeout(() => error.remove(), 400);
+    }, 4000);
 }
