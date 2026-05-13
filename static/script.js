@@ -34,6 +34,14 @@ const translations = {
         uploadedHint: "Перетащите или загрузите новое фото",
         share: "Поделиться",
         copied: "Скопировано в буфер обмена",
+        stats: "Статистика",
+        statsSubtitle: "Аналитика всех запросов",
+        statTotal: "Всего запросов",
+        statConfidence: "Средняя уверенность",
+        statTime: "Среднее время анализа",
+        topClothes: "Топ одежды",
+        topColors: "Топ цветов",
+        emptyStats: "Нет данных — сделайте первый анализ",
     },
     en: {
         title: "Clothing Detection",
@@ -56,6 +64,14 @@ const translations = {
         uploadedHint: "Drag & drop or upload a new photo",
         share: "Share",
         copied: "Copied to clipboard",
+        stats: "Statistics",
+        statsSubtitle: "Analytics of all requests",
+        statTotal: "Total requests",
+        statConfidence: "Average confidence",
+        statTime: "Average analysis time",
+        topClothes: "Top clothing",
+        topColors: "Top colors",
+        emptyStats: "No data — make your first analysis",
     }
 };
 
@@ -297,6 +313,7 @@ document.querySelector('.logo').addEventListener('click', (e) => {
     e.preventDefault();
     historyPage.classList.add('hidden');
     mainPage.classList.remove('hidden');
+    statsPage.classList.add('hidden');
 
     // Сброс состояния
     selectedFile = null;
@@ -476,4 +493,79 @@ function showFileSizeError() {
         error.classList.remove('show');
         setTimeout(() => error.remove(), 400);
     }, 4000);
+}
+
+
+// СТАТИСТИКА
+const statsBtn = document.getElementById('statsBtn');
+const statsPage = document.getElementById('statsPage');
+const emptyStats = document.getElementById('emptyStats');
+
+statsBtn.addEventListener('click', () => {
+    mainPage.classList.add('hidden');
+    historyPage.classList.add('hidden');
+    statsPage.classList.remove('hidden');
+    loadStats();
+});
+
+// возврат на главную со страницы статистики
+document.querySelector('.logo').addEventListener('click', (e) => {
+    statsPage.classList.add('hidden');
+});
+
+async function loadStats() {
+    try {
+        const response = await fetch('/stats');
+        const data = await response.json();
+        const stats = data.stats;
+
+        if (stats.total === 0) {
+            emptyStats.classList.remove('hidden');
+            return;
+        }
+
+        emptyStats.classList.add('hidden');
+
+        // карточки
+        document.getElementById('statTotal').textContent = stats.total;
+        document.getElementById('statConfidence').textContent = stats.avg_confidence + '%';
+        document.getElementById('statTime').textContent = stats.avg_process_time + 'с';
+
+        // график одежды
+        renderBarChart('clothesChart', stats.class_counts);
+
+        // график цветов
+        renderBarChart('colorsChart', stats.color_counts);
+
+    } catch (err) {
+        console.error('Ошибка загрузки статистики:', err);
+    }
+}
+
+function renderBarChart(containerId, data) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = '';
+
+    const maxVal = Math.max(...Object.values(data));
+
+    Object.entries(data).forEach(([label, count], i) => {
+        const row = document.createElement('div');
+        row.className = 'bar-row';
+        row.style.animationDelay = `${i * 0.05}s`;
+        row.innerHTML = `
+            <div class="bar-label">${label}</div>
+            <div class="bar-track">
+                <div class="bar-fill" data-width="${(count / maxVal) * 100}"></div>
+            </div>
+            <div class="bar-count">${count}</div>
+        `;
+        container.appendChild(row);
+    });
+
+    // анимация баров
+    setTimeout(() => {
+        container.querySelectorAll('.bar-fill').forEach(bar => {
+            bar.style.width = bar.dataset.width + '%';
+        });
+    }, 50);
 }

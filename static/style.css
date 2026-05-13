@@ -832,7 +832,109 @@ body.light .history-card-bar {
 }
 
 
+/* когда уверенность небольшая */
 .result-confidence.low {
     color: #f59e0b;
     font-size: 0.85em;
+}
+
+
+/* СТАТИСТИКА */
+.stats-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    width: 100%;
+    margin-bottom: 40px;
+}
+.stats-card {
+    background: #12122a;
+    border: 1px solid #2d2d4e;
+    border-radius: 16px;
+    padding: 24px;
+    text-align: center;
+    transition: all 0.3s ease;
+    animation: fadeInUp 0.4s ease both;
+}
+.stats-card:hover {
+    border-color: #7c3aed;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(124, 58, 237, 0.2);
+}
+.stats-card-icon {
+    font-size: 2em;
+    margin-bottom: 10px;
+}
+.stats-card-value {
+    font-size: 2.2em;
+    font-weight: 700;
+    color: #a855f7;
+    margin-bottom: 6px;
+}
+.stats-card-label {
+    color: #6b7280;
+    font-size: 0.85em;
+}
+.stats-section {
+    width: 100%;
+    background: #12122a;
+    border: 1px solid #2d2d4e;
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 20px;
+    animation: fadeInUp 0.5s ease both;
+}
+.stats-section-title {
+    color: #a855f7;
+    font-size: 1.1em;
+    margin-bottom: 20px;
+}
+.bar-chart {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.bar-row {
+    display: grid;
+    grid-template-columns: 120px 1fr 50px;
+    align-items: center;
+    gap: 12px;
+}
+.bar-label {
+    color: #e0e0e0;
+    font-size: 0.9em;
+    text-align: right;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.bar-track {
+    background: #1f1f3a;
+    border-radius: 10px;
+    height: 10px;
+    overflow: hidden;
+}
+.bar-fill {
+    height: 100%;
+    border-radius: 10px;
+    background: linear-gradient(90deg, #7c3aed, #a855f7);
+    transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 0%;
+}
+.bar-count {
+    color: #a855f7;
+    font-size: 0.85em;
+    font-weight: 600;
+}
+/* светлая тема */
+body.light .stats-card {
+    background: #f5f3ff;
+    border-color: #ddd6fe;
+}
+body.light .stats-section {
+    background: #f5f3ff;
+    border-color: #ddd6fe;
+}
+body.light .bar-track {
+    background: #ddd6fe;
 }

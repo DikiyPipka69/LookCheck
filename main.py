@@ -9,6 +9,8 @@ import base64
 import io
 from datetime import datetime
 from PIL import Image
+from collections import Counter
+import time
 
 
 # главный класс
@@ -132,29 +134,57 @@ class ClothingDetector:
 # класс для управления историей запросов
 class HistoryManager:
     def __init__(self):
-        # список для хранения записей в памяти
         self.items = []
 
-    def add(self, filename: str, image_url: str, detections: list):
-        # добавляем новую запись в историю
+    def add(self, filename: str, image_url: str, detections: list, process_time: float):
         self.items.append({
             "id": uuid.uuid4().hex,
             "time": datetime.now().strftime("%H:%M %d.%m.%Y"),
             "filename": filename,
             "image_url": image_url,
-            "detections": detections
+            "detections": detections,
+            "process_time": round(process_time, 2)
         })
 
     def get_all(self) -> list:
-        # возвращаем историю в обратном порядке (новые сверху)
         return list(reversed(self.items))
 
+    def get_stats(self) -> dict:
+        if not self.items:
+            return {
+                "total": 0,
+                "class_counts": {},
+                "avg_confidence": 0,
+                "avg_process_time": 0,
+                "color_counts": {}
+            }
+
+        # счётчики
+        class_counts = Counter()
+        color_counts = Counter()
+        confidences = []
+        process_times = []
+
+        for item in self.items:
+            process_times.append(item.get("process_time", 0))
+            for d in item["detections"]:
+                class_counts[d["class"]] += 1
+                color_counts[d.get("color", "неизвестный")] += 1
+                confidences.append(d["confidence"])
+
+        return {
+            "total": len(self.items),
+            "class_counts": dict(class_counts.most_common()),
+            "color_counts": dict(color_counts.most_common()),
+            "avg_confidence": round(sum(confidences) / len(confidences), 1) if confidences else 0,
+            "avg_process_time": round(sum(process_times) / len(process_times), 2) if process_times else 0,
+            "total_detections": sum(confidences.__len__() for _ in [1])
+        }
+
     def clear(self):
-        # очищаем всю историю
         self.items = []
 
     def count(self) -> int:
-        # возвращаем количество записей
         return len(self.items)
 
 
@@ -181,6 +211,8 @@ async def index(request: Request):
 # эндпоинт для определения одежды на фото
 @app.post("/detect")
 async def detect(file: UploadFile = File(...)):
+    start_time = time.time()
+
     contents = await file.read()
     image_b64 = base64.b64encode(contents).decode("utf-8")
     image_url = f"data:image/jpeg;base64,{image_b64}"
@@ -188,7 +220,8 @@ async def detect(file: UploadFile = File(...)):
 
     detections, boxes_data = detector.detect(image)
 
-    history_manager.add(file.filename, image_url, detections)
+    process_time = time.time() - start_time
+    history_manager.add(file.filename, image_url, detections, process_time)
 
     return {"detections": detections, "boxes": boxes_data}
 
@@ -197,6 +230,12 @@ async def detect(file: UploadFile = File(...)):
 @app.get("/history")
 async def get_history():
     return JSONResponse(content={"history": history_manager.get_all()})
+
+
+# эндпоинт для получения статистики
+@app.get("/stats")
+async def get_stats():
+    return JSONResponse(content={"stats": history_manager.get_stats()})
 
 
 # эндпоинт для очистки истории
