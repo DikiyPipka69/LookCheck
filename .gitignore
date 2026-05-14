@@ -13,4 +13,10 @@
 *.pyc
 __pycache__/
 
-/dataset
+# датасеты
+dataset/
+dataset_brand/
+
+# временные файлы
+uploads/
+temp_*.jpg
