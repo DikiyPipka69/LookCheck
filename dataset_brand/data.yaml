@@ -1,0 +1,13 @@
+train: ../train/images
+val: ../valid/images
+test: ../test/images
+
+nc: 7
+names: ['Adidas', 'Emirates', 'Fila', 'Nike', 'Puma', 'The North Face', 'Under Armour']
+
+roboflow:
+  workspace: s-workspace-fmfbw
+  project: brands-e1as1
+  version: 1
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/s-workspace-fmfbw/brands-e1as1/dataset/1

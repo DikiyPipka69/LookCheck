@@ -16,12 +16,13 @@ import time
 # главный класс
 class ClothingDetector:
     '''
-    Класс для работы с моделью детекции одежды
+    Класс для классификации одежды
     '''
-    def __init__(self, model_path: str):
-        # загружаем модель при создании объекта
-        self.model = YOLO(model_path)
+    def __init__(self, model_path: str, brand_model_path: str):
+        self.model = YOLO(model_path)          # одежда
+        self.brand_model = YOLO(brand_model_path)  # бренды
 
+    # функция распознавания цвета
     def get_color(self, image: Image.Image, box) -> str:
         x1, y1, x2, y2 = map(int, box.xyxy[0])
         w = x2 - x1
@@ -110,10 +111,23 @@ class ClothingDetector:
                 class_name = self.model.names[int(box.cls[0])]
                 confidence = round(float(box.conf[0]) * 100, 1)
 
+                # определяем бренд если модель загружена
+                brand = None
+                if self.brand_model is not None:
+                    # вырезаем область одежды и ищем бренд внутри
+                    cropped = image.crop((x1, y1, x2, y2))
+                    brand_results = self.brand_model(cropped)
+                    for br in brand_results:
+                        if len(br.boxes) > 0:
+                            best_brand = max(br.boxes, key=lambda b: float(b.conf[0]))
+                            if float(best_brand.conf[0]) > 0.5:
+                                brand = self.brand_model.names[int(best_brand.cls[0])]
+
                 detections.append({
                     "class": class_name,
                     "confidence": confidence,
-                    "color": color
+                    "color": color,
+                    "brand": brand
                 })
 
                 boxes_data.append({
@@ -192,7 +206,10 @@ class HistoryManager:
 app = FastAPI()
 
 # создаём объекты наших классов
-detector = ClothingDetector("runs/detect/train3/weights/best.pt")
+detector = ClothingDetector(
+    "runs/detect/train3/weights/best.pt",
+    "runs/detect/runs_brand/brand_detector/weights/best.pt"
+)
 history_manager = HistoryManager()
 
 # подключаем папку со статикой (css, js)

@@ -208,7 +208,7 @@ function showResults(detections) {
 
             item.innerHTML = `
                 <div class="result-top">
-                    <span class="result-class">👗 ${d.class} (${d.color})</span>
+                    <span class="result-class">👗 ${d.class} (${d.color})${d.brand ? ` • ${d.brand}` : ''}</span>
                     <span class="result-confidence ${d.confidence < 60 ? 'low' : ''}">${d.confidence}%${d.confidence < 60 ? ' ⚠️' : ''}</span>
                 </div>
                 <div class="progress-bar-bg">
