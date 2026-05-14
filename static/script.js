@@ -445,7 +445,7 @@ document.querySelectorAll('[data-i18n-dynamic]').forEach(el => {
 
 // ПОДЕЛИТЬСЯ РЕЗУЛЬТАТАМИ
 function shareResult(className, color, confidence, wbUrl, ozonUrl, yaUrl) {
-    const text = `👗 LookChecker — результат анализа\n\n` +
+    const text = `👗 LookCheck — результат анализа\n\n` +
         `Тип одежды: ${className}\n` +
         `Цвет: ${color}\n` +
         `Уверенность: ${confidence}%\n\n` +
