@@ -302,20 +302,31 @@ const historyGrid = document.getElementById('historyGrid');
 const emptyHistory = document.getElementById('emptyHistory');
 const imagePreview = document.getElementById('imagePreview');
 const previewPopupImg = document.getElementById('previewPopupImg');
+const statsBtn = document.getElementById('statsBtn');
+const statsPage = document.getElementById('statsPage');
+const emptyStats = document.getElementById('emptyStats');
 
 historyBtn.addEventListener('click', () => {
     mainPage.classList.add('hidden');
+    statsPage.classList.add('hidden');
     historyPage.classList.remove('hidden');
     loadHistoryGrid();
+});
+
+statsBtn.addEventListener('click', () => {
+    mainPage.classList.add('hidden');
+    historyPage.classList.add('hidden');
+    statsPage.classList.remove('hidden');
+    loadStats();
 });
 
 document.querySelector('.logo').addEventListener('click', (e) => {
     e.preventDefault();
     historyPage.classList.add('hidden');
-    mainPage.classList.remove('hidden');
     statsPage.classList.add('hidden');
+    mainPage.classList.remove('hidden');
 
-    // Сброс состояния
+    // сброс состояния
     selectedFile = null;
     isProcessed = false;
     previewImage.classList.add('hidden');
@@ -497,20 +508,11 @@ function showFileSizeError() {
 
 
 // СТАТИСТИКА
-const statsBtn = document.getElementById('statsBtn');
-const statsPage = document.getElementById('statsPage');
-const emptyStats = document.getElementById('emptyStats');
-
 statsBtn.addEventListener('click', () => {
     mainPage.classList.add('hidden');
     historyPage.classList.add('hidden');
     statsPage.classList.remove('hidden');
     loadStats();
-});
-
-// возврат на главную со страницы статистики
-document.querySelector('.logo').addEventListener('click', (e) => {
-    statsPage.classList.add('hidden');
 });
 
 async function loadStats() {

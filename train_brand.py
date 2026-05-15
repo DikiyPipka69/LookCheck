@@ -6,8 +6,8 @@ if __name__ == '__main__':
         epochs=50,
         imgsz=640,
         patience=5,
-        batch=16,
-        device="cuda",
+        batch=16, # указываем по сколько фото оно будет брать за раз
+        device="cuda", # юзаем gpu, т.к. оно в разы быстрее
         project="runs_brand",
         name="brand_detector"
     )
