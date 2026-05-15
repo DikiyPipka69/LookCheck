@@ -17,6 +17,9 @@ __pycache__/
 dataset/
 dataset_brand/
 
-# временные файлы
+# временные файлы (на всякий случай)
 uploads/
 temp_*.jpg
+
+# базовая модель yolo
+yolo26n.pt

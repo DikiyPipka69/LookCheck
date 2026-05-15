@@ -18,84 +18,70 @@ class ClothingDetector:
     '''
     Класс для классификации одежды
     '''
-    def __init__(self, model_path: str, brand_model_path: str):
-        self.model = YOLO(model_path)          # одежда
-        self.brand_model = YOLO(brand_model_path)  # бренды
+    def __init__(self, model_path: str, brand_model_path: str = None):
+        self.model = YOLO(model_path)
+        self.brand_model = YOLO(brand_model_path) if brand_model_path else None
 
-    # функция распознавания цвета
-    def get_color(self, image: Image.Image, box) -> str:
-        x1, y1, x2, y2 = map(int, box.xyxy[0])
-        w = x2 - x1
-        h = y2 - y1
-
-        # берём центральные 50%
-        x1 = x1 + w // 4
-        y1 = y1 + h // 4
-        x2 = x2 - w // 4
-        y2 = y2 - h // 4
-
-        cropped = image.crop((x1, y1, x2, y2)).resize((50, 50))
-        pixels = list(cropped.convert('RGB').getdata())
-
-        # фильтруем телесные пиксели
-        def is_skin(r, g, b):
-            return (r > 95 and g > 40 and b > 20 and
-                    max(r, g, b) - min(r, g, b) > 15 and
-                    r > g and r > b and
-                    abs(r - g) > 15)
-
-        filtered = [p for p in pixels if not is_skin(p[0], p[1], p[2])]
-
-        # если отфильтровали слишком много — используем все пиксели
-        if len(filtered) < 20:
-            filtered = pixels
-
-        r = sum(p[0] for p in filtered) // len(filtered)
-        g = sum(p[1] for p in filtered) // len(filtered)
-        b = sum(p[2] for p in filtered) // len(filtered)
-
+    # приватный метод конвертации RGB в HSL
+    def _rgb_to_hsl(self, r, g, b) -> tuple:
         rf, gf, bf = r/255, g/255, b/255
         cmax = max(rf, gf, bf)
         cmin = min(rf, gf, bf)
         diff = cmax - cmin
         l = (cmax + cmin) / 2
         s = 0 if diff == 0 else diff / (1 - abs(2*l - 1))
-
         if diff == 0:
-            hue = 0
+            h = 0
         elif cmax == rf:
-            hue = 60 * (((gf - bf) / diff) % 6)
+            h = 60 * (((gf - bf) / diff) % 6)
         elif cmax == gf:
-            hue = 60 * (((bf - rf) / diff) + 2)
+            h = 60 * (((bf - rf) / diff) + 2)
         else:
-            hue = 60 * (((rf - gf) / diff) + 4)
+            h = 60 * (((rf - gf) / diff) + 4)
+        return h, s, l
 
-        if l < 0.15:
-            return "чёрный"
-        if l > 0.85:
-            return "белый"
-        if s < 0.12:
-            return "серый / белый"
+    # функция распознавания цвета одежды
+    def get_color(self, image: Image.Image, box) -> str:
+        x1, y1, x2, y2 = map(int, box.xyxy[0])
+        w, h = x2 - x1, y2 - y1
 
-        if hue < 15 or hue >= 345:
-            return "красный / коричневый"
-        if hue < 40:
-            if l < 0.4:
-                return "коричневый"
-            return "оранжевый / бежевый"
-        if hue < 70:
-            return "жёлтый"
-        if hue < 150:
-            return "зелёный"
-        if hue < 195:
-            return "голубой"
-        if hue < 250:
-            return "синий"
-        if hue < 290:
-            return "фиолетовый"
-        if hue < 345:
-            return "розовый"
+        # берём центральные 50% рамки
+        cropped = image.crop((
+            x1 + w // 4, y1 + h // 4,
+            x2 - w // 4, y2 - h // 4
+        )).resize((50, 50))
 
+        pixels = list(cropped.convert('RGB').getdata())
+
+        # фильтруем телесные пиксели
+        def is_skin(r, g, b):
+            return (r > 95 and g > 40 and b > 20 and
+                    max(r, g, b) - min(r, g, b) > 15 and
+                    r > g and r > b and abs(r - g) > 15)
+
+        filtered = [p for p in pixels if not is_skin(p[0], p[1], p[2])]
+        if len(filtered) < 20:
+            filtered = pixels
+
+        # средний цвет
+        r = sum(p[0] for p in filtered) // len(filtered)
+        g = sum(p[1] for p in filtered) // len(filtered)
+        b = sum(p[2] for p in filtered) // len(filtered)
+
+        hue, s, l = self._rgb_to_hsl(r, g, b)
+
+        # определяем цвет по яркости и оттенку
+        if l < 0.15: return "чёрный"
+        if l > 0.85: return "белый"
+        if s < 0.12: return "серый"
+        if hue < 15 or hue >= 345: return "красный"
+        if hue < 40: return "коричневый" if l < 0.4 else "оранжевый"
+        if hue < 70: return "жёлтый"
+        if hue < 150: return "зелёный"
+        if hue < 195: return "голубой"
+        if hue < 250: return "синий"
+        if hue < 290: return "фиолетовый"
+        if hue < 345: return "розовый"
         return "неизвестный"
     
     def detect(self, image: Image.Image) -> tuple:
@@ -192,7 +178,7 @@ class HistoryManager:
             "color_counts": dict(color_counts.most_common()),
             "avg_confidence": round(sum(confidences) / len(confidences), 1) if confidences else 0,
             "avg_process_time": round(sum(process_times) / len(process_times), 2) if process_times else 0,
-            "total_detections": sum(confidences.__len__() for _ in [1])
+            "total_detections": len(confidences)
         }
 
     def clear(self):

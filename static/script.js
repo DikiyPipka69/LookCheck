@@ -18,7 +18,6 @@ const translations = {
         subtitle: "Загрузите фото — ИИ определит тип одежды и выделит её на изображении.",
         uploadTitle: "Загрузите или перетащите фото сюда",
         uploadHint: "Поддерживаются JPG, PNG, WebP. Чем чётче фото, тем точнее результат.",
-        chooseBtn: "Выбрать файл",
         analyzeBtn: "🔍 Определить одежду",
         resultsTitle: "Результат анализа",
         analyzing: "Анализируем...",
@@ -48,7 +47,6 @@ const translations = {
         subtitle: "Upload a photo — AI will detect the type of clothing.",
         uploadTitle: "Upload or drag & drop photo here",
         uploadHint: "Supports JPG, PNG, WebP. The clearer the photo, the better the result.",
-        chooseBtn: "Choose file",
         analyzeBtn: "🔍 Detect clothing",
         resultsTitle: "Analysis result",
         analyzing: "Analyzing...",
@@ -449,8 +447,8 @@ langBtn.addEventListener('click', () => {
 // Переводим динамические элементы
 document.querySelectorAll('[data-i18n-dynamic]').forEach(el => {
     const key = el.getAttribute('data-i18n-dynamic');
-    if (translations[lang][key]) {
-        el.textContent = translations[lang][key];
+    if (translations[currentLang][key]) {
+        el.textContent = translations[currentLang][key];
     }
 });
 
@@ -464,7 +462,7 @@ function shareResult(className, color, confidence, wbUrl, ozonUrl, yaUrl) {
         `• Wildberries: ${wbUrl}\n` +
         `• Ozon: ${ozonUrl}\n` +
         `• Яндекс Маркет: ${yaUrl}\n\n` +
-        `🔗 LookChecker: http://127.0.0.1:8000`;
+        `🔗 LookCheck: http://127.0.0.1:8000`;
 
     navigator.clipboard.writeText(text).then(() => {
         // показываем уведомление
@@ -508,13 +506,6 @@ function showFileSizeError() {
 
 
 // СТАТИСТИКА
-statsBtn.addEventListener('click', () => {
-    mainPage.classList.add('hidden');
-    historyPage.classList.add('hidden');
-    statsPage.classList.remove('hidden');
-    loadStats();
-});
-
 async function loadStats() {
     try {
         const response = await fetch('/stats');
