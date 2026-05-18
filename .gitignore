@@ -22,7 +22,7 @@ uploads/
 temp_*.jpg
 
 # базовая модель yolo
-yolo26n.pt
+*.pt
 
 # база данных
 lookcheck.db
