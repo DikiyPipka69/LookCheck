@@ -562,3 +562,23 @@ function renderBarChart(containerId, data) {
         });
     }, 50);
 }
+
+const closeHistoryPage = document.getElementById('closeHistoryPage');
+const closeStatsPage = document.getElementById('closeStatsPage');
+
+// Функция возврата на главную
+function goToMainPage() {
+    historyPage.classList.add('hidden');
+    statsPage.classList.add('hidden');
+    mainPage.classList.remove('hidden');
+}
+
+// Закрытие страницы истории
+if (closeHistoryPage) {
+    closeHistoryPage.addEventListener('click', goToMainPage);
+}
+
+// Закрытие страницы статистики
+if (closeStatsPage) {
+    closeStatsPage.addEventListener('click', goToMainPage);
+}

@@ -831,3 +831,58 @@ body.light .stats-section {
 body.light .bar-track {
     background: #ddd6fe;
 }
+
+/* КНОПКА ЗАКРЫТИЯ В ПРАВОМ ВЕРХНЕМ УГЛУ */
+.page-header-with-close {
+    position: relative;
+    width: 100%;
+}
+
+.close-page-icon {
+    position: fixed;
+    top: 80px;
+    right: 32px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #1f1f3a;
+    border: 1px solid #4c1d95;
+    color: #a855f7;
+    font-size: 1.3em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.close-page-icon:hover {
+    background: #7c3aed;
+    color: white;
+    transform: rotate(90deg);
+    border-color: #7c3aed;
+}
+
+/* Светлая тема */
+body.light .close-page-icon {
+    background: #ede9fe;
+    border-color: #a855f7;
+    color: #7c3aed;
+}
+
+body.light .close-page-icon:hover {
+    background: #7c3aed;
+    color: white;
+}
+
+/* Адаптация для мобильных */
+@media (max-width: 768px) {
+    .close-page-icon {
+        top: 70px;
+        right: 20px;
+        width: 36px;
+        height: 36px;
+        font-size: 1.1em;
+    }
+}

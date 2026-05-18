@@ -71,65 +71,71 @@
     </div>
 
     <!-- СТРАНИЦА ИСТОРИИ -->
-    <div id="historyPage" class="hidden">
-        <main class="history-main">
-            <div class="history-page-header">
-                <h1 data-i18n="history">История</h1>
-                <p class="subtitle" data-i18n="historySubtitle">Все предыдущие запросы</p>
-            </div>
-            <div id="historyGrid" class="history-grid"></div>
-            <p class="empty-history hidden" id="emptyHistory" data-i18n="emptyHistory">История пуста</p>
-        </main>
-        <footer>
-            <p data-i18n="footer">Умное распознавание одежды с помощью ИИ</p>
-        </footer>
+<div id="historyPage" class="hidden">
+    <div class="page-header-with-close">
+        <button class="close-page-icon" id="closeHistoryPage">✕</button>
     </div>
+    <main class="history-main">
+        <div class="history-page-header">
+            <h1 data-i18n="history">История</h1>
+            <p class="subtitle" data-i18n="historySubtitle">Все предыдущие запросы</p>
+        </div>
+        <div id="historyGrid" class="history-grid"></div>
+        <p class="empty-history hidden" id="emptyHistory" data-i18n="emptyHistory">История пуста</p>
+    </main>
+    <footer>
+        <p data-i18n="footer">Умное распознавание одежды с помощью ИИ</p>
+    </footer>
+</div>
 
-    <!-- СТРАНИЦА СТАТИСТИКИ -->
-    <div id="statsPage" class="hidden">
-        <main class="history-main">
-            <div class="history-page-header">
-                <h1 data-i18n="stats">Статистика</h1>
-                <p class="subtitle" data-i18n="statsSubtitle">Аналитика всех запросов</p>
-            </div>
-
-            <!-- карточки -->
-            <div class="stats-cards">
-                <div class="stats-card">
-                    <div class="stats-card-icon">📸</div>
-                    <div class="stats-card-value" id="statTotal">0</div>
-                    <div class="stats-card-label" data-i18n="statTotal">Всего запросов</div>
-                </div>
-                <div class="stats-card">
-                    <div class="stats-card-icon">🎯</div>
-                    <div class="stats-card-value" id="statConfidence">0%</div>
-                    <div class="stats-card-label" data-i18n="statConfidence">Средняя уверенность</div>
-                </div>
-                <div class="stats-card">
-                    <div class="stats-card-icon">⚡</div>
-                    <div class="stats-card-value" id="statTime">0с</div>
-                    <div class="stats-card-label" data-i18n="statTime">Среднее время анализа</div>
-                </div>
-            </div>
-
-            <!-- график одежды -->
-            <div class="stats-section">
-                <h2 class="stats-section-title" data-i18n="topClothes">Топ одежды</h2>
-                <div id="clothesChart" class="bar-chart"></div>
-            </div>
-
-            <!-- график цветов -->
-            <div class="stats-section">
-                <h2 class="stats-section-title" data-i18n="topColors">Топ цветов</h2>
-                <div id="colorsChart" class="bar-chart"></div>
-            </div>
-
-            <div class="empty-history hidden" id="emptyStats" data-i18n="emptyStats">Нет данных — сделайте первый анализ</div>
-        </main>
-        <footer>
-            <p data-i18n="footer">Умное распознавание одежды с помощью ИИ</p>
-        </footer>
+<!-- СТРАНИЦА СТАТИСТИКИ -->
+<div id="statsPage" class="hidden">
+    <div class="page-header-with-close">
+        <button class="close-page-icon" id="closeStatsPage">✕</button>
     </div>
+    <main class="history-main">
+        <div class="history-page-header">
+            <h1 data-i18n="stats">Статистика</h1>
+            <p class="subtitle" data-i18n="statsSubtitle">Аналитика всех запросов</p>
+        </div>
+
+        <!-- карточки -->
+        <div class="stats-cards">
+            <div class="stats-card">
+                <div class="stats-card-icon">📸</div>
+                <div class="stats-card-value" id="statTotal">0</div>
+                <div class="stats-card-label" data-i18n="statTotal">Всего запросов</div>
+            </div>
+            <div class="stats-card">
+                <div class="stats-card-icon">🎯</div>
+                <div class="stats-card-value" id="statConfidence">0%</div>
+                <div class="stats-card-label" data-i18n="statConfidence">Средняя уверенность</div>
+            </div>
+            <div class="stats-card">
+                <div class="stats-card-icon">⚡</div>
+                <div class="stats-card-value" id="statTime">0с</div>
+                <div class="stats-card-label" data-i18n="statTime">Среднее время анализа</div>
+            </div>
+        </div>
+
+        <!-- график одежды -->
+        <div class="stats-section">
+            <h2 class="stats-section-title" data-i18n="topClothes">Топ одежды</h2>
+            <div id="clothesChart" class="bar-chart"></div>
+        </div>
+
+        <!-- график цветов -->
+        <div class="stats-section">
+            <h2 class="stats-section-title" data-i18n="topColors">Топ цветов</h2>
+            <div id="colorsChart" class="bar-chart"></div>
+        </div>
+
+        <div class="empty-history hidden" id="emptyStats" data-i18n="emptyStats">Нет данных — сделайте первый анализ</div>
+    </main>
+    <footer>
+        <p data-i18n="footer">Умное распознавание одежды с помощью ИИ</p>
+    </footer>
+</div>
 
     <!-- ПРЕВЬЮ ПРИ НАВЕДЕНИИ -->
     <div class="image-preview-popup hidden" id="imagePreview">
