@@ -1,3 +1,4 @@
+opencv-python-headless
 fastapi[standard]
 uvicorn
 python-multipart
@@ -8,4 +9,3 @@ torchvision
 pillow
 sqlalchemy
 slowapi
-opencv-python-headless
