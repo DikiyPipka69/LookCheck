@@ -8,3 +8,4 @@ torchvision
 pillow
 sqlalchemy
 slowapi
+opencv-python-headless
