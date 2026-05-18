@@ -858,7 +858,6 @@ body.light .bar-track {
     height: auto;
     line-height: 1;
 }
-
 .close-page-icon:hover {
     color: #7c3aed;
     transform: scale(1.1);
@@ -868,7 +867,6 @@ body.light .bar-track {
 body.light .close-page-icon {
     color: #7c3aed;
 }
-
 body.light .close-page-icon:hover {
     color: #6d28d9;
 }

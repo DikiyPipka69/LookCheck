@@ -7,18 +7,14 @@ import base64
 from datetime import datetime
 from collections import Counter
 from PIL import Image
-
-# Импорты сторонних библиотек для веб-сервера и нейросети
 from fastapi import FastAPI, File, UploadFile, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import JSONResponse
 from ultralytics import YOLO
-
-# Импорты для работы с базой данных (из вашего локального файла database.py)
+# Импорты для работы с базой данных
 from database import SessionLocal, HistoryItem
 from sqlalchemy.orm import Session
-
 # Импорты для защиты от спама и ограничения частоты запросов (Rate Limiting)
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address

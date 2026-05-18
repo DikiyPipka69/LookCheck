@@ -5,7 +5,7 @@ from datetime import datetime
 import uuid
 
 
-# создаём базу данных в файле lookcheck.db
+# создаём lookcheck.db и фигачим туда базу данных
 engine = create_engine("sqlite:///lookcheck.db", connect_args={"check_same_thread": False})
 Base = declarative_base()
 

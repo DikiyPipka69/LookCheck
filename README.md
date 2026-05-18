@@ -1,3 +1,12 @@
+---
+title: LookCheck
+emoji: 👕
+colorFrom: blue
+colorTo: green
+sdk: docker
+app_port: 7860
+---
+
 <div align="center">
 
 <img src="https://img.shields.io/badge/Python-3.12-blue?style=for-the-badge&logo=python&logoColor=white"/>

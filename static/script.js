@@ -554,7 +554,6 @@ function renderBarChart(containerId, data) {
         `;
         container.appendChild(row);
     });
-
     // анимация баров
     setTimeout(() => {
         container.querySelectorAll('.bar-fill').forEach(bar => {

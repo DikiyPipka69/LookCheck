@@ -15,5 +15,5 @@ COPY . .
 
 EXPOSE 8000
 
-# Рекомендуется использовать uvicorn напрямую через CMD, если деплоите FastAPI
+# используем uvicorn напрямую через CMD
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
