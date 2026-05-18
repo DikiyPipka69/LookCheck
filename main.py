@@ -11,6 +11,14 @@ from datetime import datetime
 from PIL import Image
 from collections import Counter
 import time
+# database
+from database import SessionLocal, HistoryItem
+from sqlalchemy.orm import Session
+# security
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
+
 
 
 # главный класс
@@ -133,63 +141,102 @@ class ClothingDetector:
 
 # класс для управления историей запросов
 class HistoryManager:
-    def __init__(self):
-        self.items = []
-
     def add(self, filename: str, image_url: str, detections: list, process_time: float):
-        self.items.append({
-            "id": uuid.uuid4().hex,
-            "time": datetime.now().strftime("%H:%M %d.%m.%Y"),
-            "filename": filename,
-            "image_url": image_url,
-            "detections": detections,
-            "process_time": round(process_time, 2)
-        })
+        # сохраняем запись в базу данных
+        db: Session = SessionLocal()
+        try:
+            item = HistoryItem(
+                filename=filename,
+                image_url=image_url,
+                detections=detections,
+                process_time=round(process_time, 2)
+            )
+            db.add(item)
+            db.commit()
+        finally:
+            db.close()
 
     def get_all(self) -> list:
-        return list(reversed(self.items))
+        # получаем всю историю из базы
+        db: Session = SessionLocal()
+        try:
+            items = db.query(HistoryItem).order_by(HistoryItem.time.desc()).all()
+            return [
+                {
+                    "id": item.id,
+                    "time": item.time.strftime("%H:%M %d.%m.%Y"),
+                    "filename": item.filename,
+                    "image_url": item.image_url,
+                    "detections": item.detections,
+                    "process_time": item.process_time
+                }
+                for item in items
+            ]
+        finally:
+            db.close()
 
     def get_stats(self) -> dict:
-        if not self.items:
+        # считаем статистику из базы
+        db: Session = SessionLocal()
+        try:
+            items = db.query(HistoryItem).all()
+
+            if not items:
+                return {
+                    "total": 0,
+                    "class_counts": {},
+                    "avg_confidence": 0,
+                    "avg_process_time": 0,
+                    "color_counts": {}
+                }
+
+            class_counts = Counter()
+            color_counts = Counter()
+            confidences = []
+            process_times = []
+
+            for item in items:
+                process_times.append(item.process_time or 0)
+                for d in item.detections:
+                    class_counts[d["class"]] += 1
+                    color_counts[d.get("color", "неизвестный")] += 1
+                    confidences.append(d["confidence"])
+
             return {
-                "total": 0,
-                "class_counts": {},
-                "avg_confidence": 0,
-                "avg_process_time": 0,
-                "color_counts": {}
+                "total": len(items),
+                "class_counts": dict(class_counts.most_common()),
+                "color_counts": dict(color_counts.most_common()),
+                "avg_confidence": round(sum(confidences) / len(confidences), 1) if confidences else 0,
+                "avg_process_time": round(sum(process_times) / len(process_times), 2) if process_times else 0,
+                "total_detections": len(confidences)
             }
-
-        # счётчики
-        class_counts = Counter()
-        color_counts = Counter()
-        confidences = []
-        process_times = []
-
-        for item in self.items:
-            process_times.append(item.get("process_time", 0))
-            for d in item["detections"]:
-                class_counts[d["class"]] += 1
-                color_counts[d.get("color", "неизвестный")] += 1
-                confidences.append(d["confidence"])
-
-        return {
-            "total": len(self.items),
-            "class_counts": dict(class_counts.most_common()),
-            "color_counts": dict(color_counts.most_common()),
-            "avg_confidence": round(sum(confidences) / len(confidences), 1) if confidences else 0,
-            "avg_process_time": round(sum(process_times) / len(process_times), 2) if process_times else 0,
-            "total_detections": len(confidences)
-        }
+        finally:
+            db.close()
 
     def clear(self):
-        self.items = []
+        # очищаем всю историю
+        db: Session = SessionLocal()
+        try:
+            db.query(HistoryItem).delete()
+            db.commit()
+        finally:
+            db.close()
 
     def count(self) -> int:
-        return len(self.items)
+        db: Session = SessionLocal()
+        try:
+            return db.query(HistoryItem).count()
+        finally:
+            db.close()
 
 
 # инициализация приложения
 app = FastAPI()
+
+# rate limiting — не более 10 запросов в минуту с одного IP
+limiter = Limiter(key_func=get_remote_address)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # создаём объекты наших классов
 detector = ClothingDetector(
@@ -213,7 +260,8 @@ async def index(request: Request):
 
 # эндпоинт для определения одежды на фото
 @app.post("/detect")
-async def detect(file: UploadFile = File(...)):
+@limiter.limit("10/minute")
+async def detect(request: Request, file: UploadFile = File(...)):
     start_time = time.time()
 
     contents = await file.read()
@@ -251,4 +299,7 @@ async def clear_history():
 # конструкция чтобы uvicorn работал пока не выключат
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=False)
+    import os
+    port = int(os.environ.get("PORT", 8000))
+    host = "0.0.0.0" if os.environ.get("RAILWAY_ENVIRONMENT") else "127.0.0.1"
+    uvicorn.run("main:app", host=host, port=port, reload=False)

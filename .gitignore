@@ -23,3 +23,11 @@ temp_*.jpg
 
 # базовая модель yolo
 yolo26n.pt
+
+# база данных
+lookcheck.db
+
+# изображения
+*.jpg
+*.png
+*.jpeg
