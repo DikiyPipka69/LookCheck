@@ -1,9 +1,8 @@
-opencv-python-headless
+ultralytics-opencv-headless>=8.0
 fastapi[standard]
 uvicorn
 python-multipart
 jinja2
-ultralytics>=8.0
 torch>=2.0
 torchvision
 pillow

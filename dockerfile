@@ -2,11 +2,10 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
+# Установка необходимых системных библиотек
 RUN apt-get update && apt-get install -y \
-    libxcb1 \
-    libgl1-mesa-glx \
+    libgl1 \
     libglib2.0-0 \
-    libxcb-util1 \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
@@ -16,4 +15,5 @@ COPY . .
 
 EXPOSE 8000
 
-CMD ["python", "main.py"]
+# Рекомендуется использовать uvicorn напрямую через CMD, если деплоите FastAPI
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
